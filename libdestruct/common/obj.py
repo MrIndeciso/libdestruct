@@ -33,6 +33,10 @@ class obj(ABC):
     def value(self: obj) -> object:
         """Return the value of the object."""
 
+    @abstractmethod
+    def set(self: obj, value: object) -> None:
+        """Set the value of the object to the given value."""
+
     def __str__(self: obj) -> str:
         """Return a string representation of the object."""
         return str(self.value())

@@ -18,3 +18,7 @@ class c_long(obj):
     def value(self: c_long) -> int:
         """Return the value of the integer."""
         return int.from_bytes(self.memory[self.address : self.address + self.size], self.endianness, signed=True)
+
+    def set(self: c_long, value: int) -> None:
+        """Set the value of the integer to the given value."""
+        self.memory[self.address : self.address + self.size] = value.to_bytes(self.size, self.endianness, signed=True)

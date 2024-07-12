@@ -30,6 +30,10 @@ class ptr(obj):
         """Return the value of the pointer."""
         return int.from_bytes(self.memory[self.address : self.address + self.size], self.endianness)
 
+    def set(self: ptr, value: int) -> None:
+        """Set the value of the pointer to the given value."""
+        self.memory[self.address : self.address + self.size] = value.to_bytes(self.size, self.endianness)
+
     def unwrap(self, length: int | None = None) -> obj:
         """Return the object pointed to by the pointer.
 

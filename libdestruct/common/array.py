@@ -10,6 +10,8 @@ from abc import ABC, abstractmethod
 
 
 class array(ABC):
+    """An array of objects."""
+
     @abstractmethod
     def size(self: array) -> int:
         """Return the size of the array."""

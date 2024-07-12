@@ -10,10 +10,11 @@ from typing import TYPE_CHECKING
 
 from libdestruct.common.obj import obj
 from libdestruct.common.struct import struct, struct_impl
-from libdestruct.common.struct.struct_field import StructField
 
 if TYPE_CHECKING:
     from collections.abc import MutableSequence
+
+    from libdestruct.common.struct.struct_field import StructField
 
 
 class TypeInflater:
