@@ -30,17 +30,27 @@ class obj(ABC):
         self.address = address
 
     @abstractmethod
-    def value(self: obj) -> object:
+    def get(self: obj) -> object:
         """Return the value of the object."""
 
     @abstractmethod
     def set(self: obj, value: object) -> None:
         """Set the value of the object to the given value."""
 
+    @property
+    def value(self: obj) -> object:
+        """Return the value of the object."""
+        return self.get()
+
+    @value.setter
+    def value(self: obj, value: object) -> None:
+        """Set the value of the object to the given value."""
+        self.set(value)
+
     def __str__(self: obj) -> str:
         """Return a string representation of the object."""
-        return str(self.value())
+        return str(self.get())
 
     def __repr__(self: obj) -> str:
         """Return a string representation of the object."""
-        return f"{self.__class__.__name__}({self.value()})"
+        return f"{self.__class__.__name__}({self.get()})"

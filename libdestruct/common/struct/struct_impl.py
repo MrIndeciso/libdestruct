@@ -24,6 +24,6 @@ class struct_impl(struct):
         self.address = address
         self.length = 0
 
-    def value(self: struct_impl) -> str:
+    def get(self: struct_impl) -> str:
         """Return the value of the struct."""
         return f"{self.name}(address={self.address}, length={self.length})"

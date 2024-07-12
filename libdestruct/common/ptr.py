@@ -26,7 +26,7 @@ class ptr(obj):
         super().__init__(memory, address)
         self.wrapper = wrapper
 
-    def value(self: ptr) -> int:
+    def get(self: ptr) -> int:
         """Return the value of the pointer."""
         return int.from_bytes(self.memory[self.address : self.address + self.size], self.endianness)
 
@@ -40,7 +40,7 @@ class ptr(obj):
         Args:
             length: The length of the object in memory this points to.
         """
-        address = self.value()
+        address = self.get()
 
         if self.wrapper:
             if length:
@@ -59,7 +59,7 @@ class ptr(obj):
         Args:
             length: The length of the object in memory this points to.
         """
-        address = self.value()
+        address = self.get()
 
         try:
             # If the address is invalid, this will raise an IndexError or ValueError.

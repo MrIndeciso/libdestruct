@@ -10,12 +10,12 @@ from libdestruct.common.obj import obj
 
 
 class c_ulong(obj):
-    """A C long."""
+    """A C unsigned long."""
 
     size: int = 8
     """The size of an integer in bytes."""
 
-    def value(self: c_ulong) -> int:
+    def get(self: c_ulong) -> int:
         """Return the value of the integer."""
         return int.from_bytes(self.memory[self.address : self.address + self.size], self.endianness, signed=False)
 

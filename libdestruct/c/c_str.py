@@ -44,6 +44,6 @@ class c_str(obj, array):
         for i in range(self.size()):
             yield self.get(i)
 
-    def value(self: c_str) -> bytes:
+    def get(self: c_str) -> bytes:
         """Return the value of the string."""
         return bytes(self.memory[self.address : self.address + self.size()])

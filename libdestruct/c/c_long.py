@@ -15,7 +15,7 @@ class c_long(obj):
     size: int = 8
     """The size of an integer in bytes."""
 
-    def value(self: c_long) -> int:
+    def get(self: c_long) -> int:
         """Return the value of the integer."""
         return int.from_bytes(self.memory[self.address : self.address + self.size], self.endianness, signed=True)
 
