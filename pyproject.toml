@@ -1,0 +1,55 @@
+[project]
+name = "libdestruct"
+authors = [
+    {name = "MrIndeciso"},
+]
+description = "Native structs made Pythonic"
+requires-python = ">=3.10"
+license = {file = "LICENSE"}
+readme = {file = "README.md", content-type = "text/markdown"}
+version = "0.1.0a"
+classifiers = [
+    "Development Status :: 1 - Planning",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Information Technology",
+    "Intended Audience :: System Administrators",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: C",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Security",
+    "Topic :: Software Development :: Debuggers",
+    "Typing :: Typed",
+]
+keywords = ["struct", "c", "debugger", "memory", "reverse", "rev", "reverse-engineering", "script", "libdebug"]
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+    "rich",
+]
+
+[tool.ruff]
+line-length = 120
+indent-width = 4
+target-version = "py312"
+exclude = ["test/"]
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = ["D100", "D104", "EM", "FBT", "G", "TD", "TRY002", "TRY003", "RET505", "SLF001", "S603", "S606", "N801"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"
