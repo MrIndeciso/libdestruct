@@ -6,12 +6,9 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-
 from libdestruct.common.obj import obj
 
 
-@dataclass(init=False, repr=False, eq=False, order=False, unsafe_hash=False, frozen=False, slots=True)
 class struct(obj):
     """A C struct."""
 

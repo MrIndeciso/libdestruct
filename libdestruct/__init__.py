@@ -6,13 +6,14 @@
 
 try:
     from rich.traceback import install
+
     install()
 except ImportError:
     pass
 
 from libdestruct.c import c_int, c_long, c_str, c_uint, c_ulong
 from libdestruct.common import ptr
-from libdestruct.common.struct import ptr_to, struct
+from libdestruct.common.struct import ptr_to, ptr_to_self, struct
 from libdestruct.libdestruct import inflater
 
-__all__ = ["c_int", "c_long", "c_str", "c_uint", "c_ulong", "inflater", "struct", "ptr", "ptr_to"]
+__all__ = ["c_int", "c_long", "c_str", "c_uint", "c_ulong", "inflater", "struct", "ptr", "ptr_to", "ptr_to_self"]

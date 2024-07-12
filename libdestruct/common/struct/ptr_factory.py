@@ -17,3 +17,8 @@ if TYPE_CHECKING:
 def ptr_to(item: obj) -> PtrStructField:
     """Crafts a struct member which is a pointer to an object."""
     return PtrStructField(item)
+
+
+def ptr_to_self() -> PtrStructField:
+    """Crafts a struct member which is a pointer to a struct of the same type."""
+    return PtrStructField(None)

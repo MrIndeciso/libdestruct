@@ -10,6 +10,7 @@ from typing import TYPE_CHECKING
 
 from libdestruct.common.obj import obj
 from libdestruct.common.struct import struct, struct_impl
+from libdestruct.common.struct.ptr_struct_field import PtrStructField
 
 if TYPE_CHECKING:
     from collections.abc import MutableSequence
@@ -20,11 +21,11 @@ if TYPE_CHECKING:
 class TypeInflater:
     """The memory manager, which inflates any memory-referencing type."""
 
-    def __init__(self, memory: MutableSequence) -> None:
+    def __init__(self: TypeInflater, memory: MutableSequence) -> None:
         """Initialize the memory manager."""
         self.memory = memory
 
-    def inflate(self: TypeInflater, item: type, address: int) -> obj:
+    def inflate(self: TypeInflater, item: type, address: int | tuple[obj, int]) -> obj:
         """Inflate a memory-referencing type.
 
         Args:
@@ -42,11 +43,20 @@ class TypeInflater:
 
         return item(self.memory, address)
 
-    def inflate_field(self: TypeInflater, _: type, field: StructField, address: int) -> obj:
+    def inflate_field(
+        self: TypeInflater,
+        _: type,
+        own: type,
+        field: StructField,
+        address: int | tuple[obj, int],
+    ) -> obj:
         """Inflate a field of a struct that has an associated generator."""
+        if isinstance(field, PtrStructField) and not field.backing_type:
+            field.backing_type = own
+
         return field.inflate(self.memory, address)
 
-    def inflate_struct(self: TypeInflater, item: struct, address: int) -> struct:
+    def inflate_struct(self: TypeInflater, item: struct, address: int | tuple[obj, int]) -> struct:
         """Inflate a struct.
 
         Args:
@@ -56,19 +66,34 @@ class TypeInflater:
         Returns:
             The inflated struct.
         """
-        result = struct_impl(item.__qualname__, self.memory, address)
-        current_address = address
+        new_type = type(item.__name__, (struct_impl,), {"_members": {}})
+
+        new_type._reference = None
+
+        impl = new_type(self.memory, address)
+
+        new_type._reference = item
+        new_type._inflater = self
+
+        self._inflate_struct_instance(impl, new_type)
+
+        return impl
+
+    def _inflate_struct_instance(self: TypeInflater, impl: struct_impl, new_type: type) -> None:
+        item = impl._reference
+
+        current_offset = 0
 
         for name, annotation in item.__annotations__.items():
             if name in item.__dict__:
                 # Field associated with the annotation
                 field = getattr(item, name)
-                setattr(result, name, self.inflate_field(annotation, field, current_address))
+                result = self.inflate_field(annotation, new_type, field, (impl, current_offset))
             else:
-                setattr(result, name, self.inflate(annotation, current_address))
+                result = self.inflate(annotation, (impl, current_offset))
 
-            current_address += annotation.size
+            setattr(new_type, name, result)
+            impl._members[name] = result
+            current_offset += annotation.size
 
-        result.length = current_address - address
-
-        return result
+        impl.length = current_offset

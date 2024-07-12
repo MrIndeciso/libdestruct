@@ -15,7 +15,7 @@ class ptr(obj):
     size: int = 8
     """The size of a pointer in bytes."""
 
-    def __init__(self, memory: bytearray, address: int, wrapper: type | None = None) -> None:
+    def __init__(self: ptr, memory: bytearray, address: int, wrapper: type | None = None) -> None:
         """Initialize a pointer.
 
         Args:
@@ -34,7 +34,7 @@ class ptr(obj):
         """Set the value of the pointer to the given value."""
         self.memory[self.address : self.address + self.size] = value.to_bytes(self.size, self.endianness)
 
-    def unwrap(self, length: int | None = None) -> obj:
+    def unwrap(self: ptr, length: int | None = None) -> obj:
         """Return the object pointed to by the pointer.
 
         Args:
@@ -53,7 +53,7 @@ class ptr(obj):
 
         return self.memory[address : address + length]
 
-    def try_unwrap(self, length: int | None = None) -> obj | None:
+    def try_unwrap(self: ptr, length: int | None = None) -> obj | None:
         """Return the object pointed to by the pointer, if it is valid.
 
         Args:
@@ -68,3 +68,10 @@ class ptr(obj):
             return None
 
         return self.unwrap(length)
+
+    def __str__(self: ptr) -> str:
+        """Return a string representation of the pointer."""
+        if self.wrapper:
+            return f"{self.wrapper.__name__}@0x{self.get():x}"
+
+        return f"ptr@0x{self.get():x}"

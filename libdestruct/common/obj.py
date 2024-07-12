@@ -16,10 +16,16 @@ if TYPE_CHECKING:
 class obj(ABC):
     """A generic object, with reference to the backing memory view."""
 
+    address: int
+    """The address of the object in the memory view."""
+
     endianness: str = "little"
     """The endianness of the backing refenrece view."""
 
-    def __init__(self: obj, memory: MutableSequence, address: int) -> None:
+    memory: MutableSequence
+    """The backing memory view."""
+
+    def __init__(self: obj, memory: MutableSequence, address: int | tuple[obj, int]) -> None:
         """Initialize a generic object.
 
         Args:
@@ -27,7 +33,21 @@ class obj(ABC):
             address: The address of the object in the memory view
         """
         self.memory = memory
-        self.address = address
+
+        if isinstance(address, tuple):
+            self._address = None
+            self._reference = address[0]
+            self._offset = address[1]
+        else:
+            self._address = address
+
+    @property
+    def address(self: obj) -> int:
+        """Return the address of the object in the memory view."""
+        if self._address is not None:
+            return self._address
+
+        return self._reference.address + self._offset
 
     @abstractmethod
     def get(self: obj) -> object:
