@@ -91,7 +91,7 @@ class TypeInflater:
             if name in reference_type.__dict__:
                 # Field associated with the annotation
                 field = getattr(reference_type, name)
-                result = self.inflate_field(annotation, field, (instance, current_offset))
+                result = self.inflate_field(reference_type._type_impl, field, (instance, current_offset))
             else:
                 result = self.inflate(annotation, (instance, current_offset))
 
