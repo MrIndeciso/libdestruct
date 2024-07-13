@@ -32,7 +32,7 @@ class c_str(obj, array):
 
         return bytes([self.memory[self.address + index]])
 
-    def set(self: c_str, index: int, value: bytes) -> None:
+    def _set(self: c_str, index: int, value: bytes) -> None:
         """Set the character at the given index to the given value."""
         if index < 0 or index >= self.size():
             raise IndexError("String index out of range.")

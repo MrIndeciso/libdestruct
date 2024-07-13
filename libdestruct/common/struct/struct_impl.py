@@ -56,7 +56,7 @@ class struct_impl(struct):
         """Return the value of the struct."""
         return f"{self.name}(address={self.address}, size={self.size})"
 
-    def set(self: struct_impl, _: str) -> None:
+    def _set(self: struct_impl, _: str) -> None:
         """Set the value of the struct to the given value."""
         raise RuntimeError("Cannot set the value of a struct.")
 
@@ -94,3 +94,16 @@ class struct_impl(struct):
         {members}
     }}
 }}"""
+
+    def __eq__(self, value: object) -> bool:
+        """Return whether the struct is equal to the given value."""
+        if not isinstance(value, struct_impl):
+            return False
+
+        if self.size != value.size:
+            return False
+
+        if not self._members.keys() == value._members.keys():
+            return False
+
+        return all(getattr(self, name) == getattr(value, name) for name in self._members)

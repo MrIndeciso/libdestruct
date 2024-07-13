@@ -30,7 +30,7 @@ class ptr(obj):
         """Return the value of the pointer."""
         return int.from_bytes(self.memory[self.address : self.address + self.size], self.endianness)
 
-    def set(self: ptr, value: int) -> None:
+    def _set(self: ptr, value: int) -> None:
         """Set the value of the pointer to the given value."""
         self.memory[self.address : self.address + self.size] = value.to_bytes(self.size, self.endianness)
 

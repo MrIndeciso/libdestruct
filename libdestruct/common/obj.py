@@ -60,8 +60,15 @@ class obj(ABC):
         """Return the value of the object."""
 
     @abstractmethod
+    def _set(self: obj, value: object) -> None:
+        """Set the value of the object to the given value."""
+
     def set(self: obj, value: object) -> None:
         """Set the value of the object to the given value."""
+        if self._frozen:
+            raise ValueError("Cannot set the value of a frozen object.")
+
+        self._set(value)
 
     def freeze(self: obj) -> None:
         """Freeze the object."""
@@ -81,7 +88,7 @@ class obj(ABC):
         if self._frozen:
             raise ValueError("Cannot set the value of a frozen object.")
 
-        self.set(value)
+        self._set(value)
 
     def to_str(self: obj, indent: int = 0) -> str:
         """Return a string representation of the object."""
@@ -94,3 +101,10 @@ class obj(ABC):
     def __repr__(self: obj) -> str:
         """Return a string representation of the object."""
         return f"{self.__class__.__name__}({self.get()})"
+
+    def __eq__(self, value: object) -> bool:
+        """Return whether the object is equal to the given value."""
+        if not isinstance(value, obj):
+            return False
+
+        return self.get() == value.get()
