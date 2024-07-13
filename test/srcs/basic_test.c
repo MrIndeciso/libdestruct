@@ -4,9 +4,26 @@
 // Licensed under the MIT license. See LICENSE file in the project root for details.
 //
 
+// gcc -o binaries/basic_test srcs/basic_test.c
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/mman.h>
+
+void signpost1()
+{
+
+}
+
+void signpost2()
+{
+
+}
+
+void signpost3()
+{
+
+}
 
 int main()
 {
@@ -22,12 +39,19 @@ int main()
     long *provola3 = (long *) (address + 0x200);
     unsigned long *provola4 = (unsigned long *) (address + 0x300);
 
+    *provola1 = 1;
+    *provola2 = 2;
+    *provola3 = 3;
+    *provola4 = 4;
+
+    signpost1();
+
     *provola1 = 0xdeadbeef;
     *provola2 = 0xdeadbeef * 2;
     *provola3 = 0xdeadbeefdeadbeefULL;
     *provola4 = 0xdeadbeefdeadbeefULL * 2;
 
-    __asm__ __volatile__ ("nop");
+    signpost2();
 
     if (*provola1 != 1) {
         printf("provola1 failed\n");
@@ -49,7 +73,7 @@ int main()
         return 1;
     }
 
-    __asm__ __volatile__ ("nop");
+    signpost3();
 
     return 0;
 }

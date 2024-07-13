@@ -10,16 +10,16 @@ from libdebug import debugger
 from libdestruct import inflater, c_int, c_long, c_uint, c_ulong
 
 class BasicTest(unittest.TestCase):
-    def test_basic_types(self):
+    def test_integer_types(self):
         d = debugger("binaries/basic_test")
 
         d.run()
 
         # Validate readings
-        bp1 = d.bp(0x4011fd)
+        bp1 = d.bp("signpost2")
 
         # Validate assignments
-        bp2 = d.bp(0x401272)
+        bp2 = d.bp("signpost3")
 
         libdestruct = inflater(d.memory)
 
@@ -42,13 +42,101 @@ class BasicTest(unittest.TestCase):
         self.assertEqual(provola3.get(), twos_complement(0xdeadbeefdeadbeef, 64))
         self.assertEqual(provola4.get(), (0xdeadbeefdeadbeef * 2) & ((1 << 64) - 1))
 
-        provola1.set(0x1)
-        provola2.set(0x2)
+        provola1._set(0x1)
+        provola2._set(0x2)
         provola3.value = 0x3
-        provola4.set(0x4)
+        provola4._set(0x4)
 
         d.cont()
 
         assert bp2.hit_on(d)
 
         d.kill()
+
+        d.terminate()
+
+    def test_integer_type_freeze(self):
+        d = debugger("binaries/basic_test")
+
+        d.run()
+
+        bp1 = d.bp("signpost1")
+
+        bp2 = d.bp("signpost2")
+
+        libdestruct = inflater(d.memory)
+
+        d.cont()
+
+        assert bp1.hit_on(d)
+
+        provola1 = libdestruct.inflate(c_int, 0xdeadb000)
+        provola2 = libdestruct.inflate(c_uint, 0xdeadb000 + 0x100)
+        provola3 = libdestruct.inflate(c_long, 0xdeadb000 + 0x200)
+        provola4 = libdestruct.inflate(c_ulong, 0xdeadb000 + 0x300)
+
+        self.assertEqual(provola1.value, 1)
+        self.assertEqual(provola2.value, 2)
+        self.assertEqual(provola3.value, 3)
+        self.assertEqual(provola4.value, 4)
+
+        provola1.freeze()
+        provola2.freeze()
+        provola3.freeze()
+        provola4.freeze()
+
+        d.cont()
+
+        assert bp2.hit_on(d)
+
+        self.assertEqual(provola1.value, 1)
+        self.assertEqual(provola2.value, 2)
+        self.assertEqual(provola3.value, 3)
+        self.assertEqual(provola4.value, 4)
+
+        self.assertRaises(ValueError, provola1.set, 0x1)
+
+        d.kill()
+
+        d.terminate()
+
+    def test_integer_type_equality(self):
+        d = debugger("binaries/basic_test")
+
+        d.run()
+
+        bp1 = d.bp("signpost1")
+
+        bp2 = d.bp("signpost2")
+
+        libdestruct = inflater(d.memory)
+
+        d.cont()
+
+        assert bp1.hit_on(d)
+
+        provola1 = libdestruct.inflate(c_int, 0xdeadb000)
+        provola2 = libdestruct.inflate(c_uint, 0xdeadb000 + 0x100)
+        provola3 = libdestruct.inflate(c_long, 0xdeadb000 + 0x200)
+        provola4 = libdestruct.inflate(c_ulong, 0xdeadb000 + 0x300)
+
+        self.assertEqual(provola1.value, 1)
+        self.assertEqual(provola2.value, 2)
+        self.assertEqual(provola3.value, 3)
+        self.assertEqual(provola4.value, 4)
+
+        self.assertNotEqual(provola1, provola2)
+
+        provola2.set(0x1)
+
+        self.assertEqual(provola1, provola2)
+
+        provola3.freeze()
+
+        provola1.set(0x3)
+
+        self.assertEqual(provola1, provola3)
+
+        d.kill()
+
+        d.terminate()
