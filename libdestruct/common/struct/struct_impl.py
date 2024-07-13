@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from libdestruct.common.obj import obj
 from libdestruct.common.struct import struct
 
 if TYPE_CHECKING:
@@ -58,6 +59,14 @@ class struct_impl(struct):
     def set(self: struct_impl, _: str) -> None:
         """Set the value of the struct to the given value."""
         raise RuntimeError("Cannot set the value of a struct.")
+
+    def freeze(self: obj) -> None:
+        """Freeze the struct."""
+        # The struct has no implicit value, but it must freeze its members
+        for member in self._members.values():
+            member.freeze()
+
+        self._frozen = True
 
     def to_str(self: struct_impl, indent: int = 0) -> str:
         """Return a string representation of the struct."""

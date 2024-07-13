@@ -25,6 +25,12 @@ class obj(ABC):
     memory: MutableSequence
     """The backing memory view."""
 
+    _frozen: bool = False
+    """Whether the object is frozen."""
+
+    _frozen_value: object = None
+    """The frozen value of the object."""
+
     def __init__(self: obj, memory: MutableSequence, address: int | tuple[obj, int]) -> None:
         """Initialize a generic object.
 
@@ -57,14 +63,24 @@ class obj(ABC):
     def set(self: obj, value: object) -> None:
         """Set the value of the object to the given value."""
 
+    def freeze(self: obj) -> None:
+        """Freeze the object."""
+        self._frozen_value = self.get()
+        self._frozen = True
+
     @property
     def value(self: obj) -> object:
         """Return the value of the object."""
+        if self._frozen:
+            return self._frozen_value
         return self.get()
 
     @value.setter
     def value(self: obj, value: object) -> None:
         """Set the value of the object to the given value."""
+        if self._frozen:
+            raise ValueError("Cannot set the value of a frozen object.")
+
         self.set(value)
 
     def to_str(self: obj, indent: int = 0) -> str:
