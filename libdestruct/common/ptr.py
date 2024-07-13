@@ -69,9 +69,13 @@ class ptr(obj):
 
         return self.unwrap(length)
 
-    def __str__(self: ptr) -> str:
+    def to_str(self: ptr, indent: int = 0) -> str:
         """Return a string representation of the pointer."""
         if self.wrapper:
-            return f"{self.wrapper.__name__}@0x{self.get():x}"
+            return f"{' ' * indent}{self.wrapper.__name__}@0x{self.get():x}"
 
-        return f"ptr@0x{self.get():x}"
+        return f"{' ' * indent}ptr@0x{self.get():x}"
+
+    def __str__(self: ptr) -> str:
+        """Return a string representation of the pointer."""
+        return self.to_str()

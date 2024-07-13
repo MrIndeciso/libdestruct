@@ -67,9 +67,13 @@ class obj(ABC):
         """Set the value of the object to the given value."""
         self.set(value)
 
+    def to_str(self: obj, indent: int = 0) -> str:
+        """Return a string representation of the object."""
+        return f"{' ' * indent}{self.get()}"
+
     def __str__(self: obj) -> str:
         """Return a string representation of the object."""
-        return str(self.get())
+        return self.to_str()
 
     def __repr__(self: obj) -> str:
         """Return a string representation of the object."""

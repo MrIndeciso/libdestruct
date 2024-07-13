@@ -20,6 +20,9 @@ if TYPE_CHECKING:
 class struct_impl(struct):
     """The implementation for the C struct type."""
 
+    size: int
+    """The size of the struct in bytes."""
+
     _members: dict[str, obj]
     """The members of the struct."""
 
@@ -41,31 +44,36 @@ class struct_impl(struct):
         else:
             self._address = address
 
-        self.length = 0
+        self.size = 0
         self._members = {}
 
-        if self._reference:
-            self._inflater._inflate_struct_instance(self, self.__class__)
+        if hasattr(self, "_reference_struct") and hasattr(self, "_inflater"):
+            reference_type = self._reference_struct
+            self._inflater._inflate_struct_instance(self, reference_type, reference_type._type_impl)
 
     def get(self: struct_impl) -> str:
         """Return the value of the struct."""
-        return f"{self.name}(address={self.address}, length={self.length})"
+        return f"{self.name}(address={self.address}, size={self.size})"
 
     def set(self: struct_impl, _: str) -> None:
         """Set the value of the struct to the given value."""
         raise RuntimeError("Cannot set the value of a struct.")
 
-    def __str__(self: struct_impl) -> str:
+    def to_str(self: struct_impl, indent: int = 0) -> str:
         """Return a string representation of the struct."""
         return f"""{self.name} {{
-    {',\n    '.join([f"{name}: {member}" for name, member in self._members.items()])}
-}}"""
+    {',\n    '.join([f"{' ' * indent}{name}: {member.to_str(indent + 4) if isinstance(member, struct) else member.to_str(0)}" for name, member in self._members.items()])}
+{' ' * indent}}}"""
+
+    def __str__(self: struct_impl) -> str:
+        """Return a string representation of the struct."""
+        return self.to_str()
 
     def __repr__(self: struct_impl) -> str:
         """Return a string representation of the struct."""
         return f"""{self.name} {{
     address: 0x{self.address:x},
-    length: 0x{self.length:x},
+    size: 0x{self.size:x},
     members: {{
         {',\n    '.join([f"{name}: {member}" for name, member in self._members.items()])}
     }}

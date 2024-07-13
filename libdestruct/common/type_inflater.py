@@ -56,44 +56,55 @@ class TypeInflater:
 
         return field.inflate(self.memory, address)
 
-    def inflate_struct(self: TypeInflater, item: struct, address: int | tuple[obj, int]) -> struct:
+    def inflate_struct(self: TypeInflater, reference_type: type, address: int | tuple[obj, int]) -> struct:
         """Inflate a struct.
 
         Args:
-            item: The struct to inflate.
+            reference_type: The struct to inflate.
             address: The address of the struct in the memory view.
 
         Returns:
             The inflated struct.
         """
-        new_type = type(item.__name__, (struct_impl,), {"_members": {}})
+        if hasattr(reference_type, "_type_impl"):
+            type_impl = reference_type._type_impl
+            instance = type_impl(self.memory, address)
+        else:
+            type_impl = type(reference_type.__name__, (struct_impl,), {"_members": {}})
 
-        new_type._reference = None
+            type_impl._reference_struct = None
 
-        impl = new_type(self.memory, address)
+            instance = type_impl(self.memory, address)
 
-        new_type._reference = item
-        new_type._inflater = self
+            type_impl._reference_struct = reference_type
+            type_impl._inflater = self
 
-        self._inflate_struct_instance(impl, new_type)
+            reference_type._type_impl = type_impl
 
-        return impl
+        self._inflate_struct_instance(instance, reference_type, type_impl)
 
-    def _inflate_struct_instance(self: TypeInflater, impl: struct_impl, new_type: type) -> None:
-        item = impl._reference
+        reference_type.size = instance.size
 
+        return instance
+
+    def _inflate_struct_instance(
+        self: TypeInflater,
+        instance: struct_impl,
+        reference_type: type,
+        type_impl: type,
+    ) -> None:
         current_offset = 0
 
-        for name, annotation in item.__annotations__.items():
-            if name in item.__dict__:
+        for name, annotation in reference_type.__annotations__.items():
+            if name in reference_type.__dict__:
                 # Field associated with the annotation
-                field = getattr(item, name)
-                result = self.inflate_field(annotation, new_type, field, (impl, current_offset))
+                field = getattr(reference_type, name)
+                result = self.inflate_field(annotation, type_impl, field, (instance, current_offset))
             else:
-                result = self.inflate(annotation, (impl, current_offset))
+                result = self.inflate(annotation, (instance, current_offset))
 
-            setattr(new_type, name, result)
-            impl._members[name] = result
+            setattr(instance, name, result)
+            instance._members[name] = result
             current_offset += annotation.size
 
-        impl.length = current_offset
+        type_impl.size = current_offset
