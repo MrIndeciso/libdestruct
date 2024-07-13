@@ -43,16 +43,13 @@ class TypeInflater:
 
         return item(self.memory, address)
 
-    def inflate_field(
-        self: TypeInflater,
-        _: type,
-        own: type,
-        field: StructField,
-        address: int | tuple[obj, int],
-    ) -> obj:
+    def inflate_field(self: TypeInflater, own: type, field: StructField, address: int | tuple[obj, int]) -> obj:
         """Inflate a field of a struct that has an associated generator."""
-        if isinstance(field, PtrStructField) and not field.backing_type:
-            field.backing_type = own
+        if isinstance(field, PtrStructField):
+            if not field.backing_type:
+                field.backing_type = own
+            elif issubclass(field.backing_type, struct) and not issubclass(field.backing_type, struct_impl):
+                field.backing_type = field.backing_type._type_impl
 
         return field.inflate(self.memory, address)
 
@@ -81,25 +78,20 @@ class TypeInflater:
 
             reference_type._type_impl = type_impl
 
-        self._inflate_struct_instance(instance, reference_type, type_impl)
+        self._inflate_struct_instance(instance, reference_type)
 
         reference_type.size = instance.size
 
         return instance
 
-    def _inflate_struct_instance(
-        self: TypeInflater,
-        instance: struct_impl,
-        reference_type: type,
-        type_impl: type,
-    ) -> None:
+    def _inflate_struct_instance(self: TypeInflater, instance: struct_impl, reference_type: type) -> None:
         current_offset = 0
 
         for name, annotation in reference_type.__annotations__.items():
             if name in reference_type.__dict__:
                 # Field associated with the annotation
                 field = getattr(reference_type, name)
-                result = self.inflate_field(annotation, type_impl, field, (instance, current_offset))
+                result = self.inflate_field(annotation, field, (instance, current_offset))
             else:
                 result = self.inflate(annotation, (instance, current_offset))
 
@@ -107,4 +99,4 @@ class TypeInflater:
             instance._members[name] = result
             current_offset += annotation.size
 
-        type_impl.size = current_offset
+        instance.size = current_offset

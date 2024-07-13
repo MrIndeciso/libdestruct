@@ -49,7 +49,7 @@ class struct_impl(struct):
 
         if hasattr(self, "_reference_struct") and hasattr(self, "_inflater"):
             reference_type = self._reference_struct
-            self._inflater._inflate_struct_instance(self, reference_type, reference_type._type_impl)
+            self._inflater._inflate_struct_instance(self, reference_type)
 
     def get(self: struct_impl) -> str:
         """Return the value of the struct."""
@@ -61,7 +61,12 @@ class struct_impl(struct):
 
     def to_str(self: struct_impl, indent: int = 0) -> str:
         """Return a string representation of the struct."""
-        members = ",\n".join([f"{' ' * (indent + 4)}{name}: {member.to_str(indent + 4) if isinstance(member, struct) else member.to_str(0)}" for name, member in self._members.items()])
+        members = ",\n".join(
+            [
+                f"{' ' * (indent + 4)}{name}: {member.to_str(indent + 4) if isinstance(member, struct) else member.to_str(0)}"
+                for name, member in self._members.items()
+            ],
+        )
         return f"""{self.name} {{
 {members}
 {' ' * indent}}}"""
