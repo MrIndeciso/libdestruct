@@ -61,8 +61,9 @@ class struct_impl(struct):
 
     def to_str(self: struct_impl, indent: int = 0) -> str:
         """Return a string representation of the struct."""
+        members = ",\n".join([f"{' ' * (indent + 4)}{name}: {member.to_str(indent + 4) if isinstance(member, struct) else member.to_str(0)}" for name, member in self._members.items()])
         return f"""{self.name} {{
-    {',\n    '.join([f"{' ' * indent}{name}: {member.to_str(indent + 4) if isinstance(member, struct) else member.to_str(0)}" for name, member in self._members.items()])}
+{members}
 {' ' * indent}}}"""
 
     def __str__(self: struct_impl) -> str:
@@ -71,10 +72,11 @@ class struct_impl(struct):
 
     def __repr__(self: struct_impl) -> str:
         """Return a string representation of the struct."""
+        members = ",\n".join([f"{name}: {member}" for name, member in self._members.items()])
         return f"""{self.name} {{
     address: 0x{self.address:x},
     size: 0x{self.size:x},
     members: {{
-        {',\n    '.join([f"{name}: {member}" for name, member in self._members.items()])}
+        {members}
     }}
 }}"""
