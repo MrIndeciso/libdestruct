@@ -230,9 +230,6 @@ class BasicStructTest(unittest.TestCase):
 
         struct_ptr = d.regs.rdi
 
-        # TODO: this is a hack, fix
-        _ = libdestruct.inflate(test5, 0x0)
-
         test = libdestruct.inflate(test8, struct_ptr)
 
         self.assertEqual(test.a.unwrap().a.value, 0x5eadbeef)

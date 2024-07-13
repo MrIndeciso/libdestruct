@@ -49,6 +49,9 @@ class TypeInflater:
             if not field.backing_type:
                 field.backing_type = own
             elif issubclass(field.backing_type, struct) and not issubclass(field.backing_type, struct_impl):
+                if not hasattr(field.backing_type, "_type_impl"):
+                    self._inflate_struct_type(field.backing_type)
+
                 field.backing_type = field.backing_type._type_impl
 
         return field.inflate(self.memory, address)
@@ -63,20 +66,10 @@ class TypeInflater:
         Returns:
             The inflated struct.
         """
-        if hasattr(reference_type, "_type_impl"):
-            type_impl = reference_type._type_impl
-            instance = type_impl(self.memory, address)
-        else:
-            type_impl = type(reference_type.__name__, (struct_impl,), {"_members": {}})
+        self._inflate_struct_type(reference_type)
 
-            type_impl._reference_struct = None
-
-            instance = type_impl(self.memory, address)
-
-            type_impl._reference_struct = reference_type
-            type_impl._inflater = self
-
-            reference_type._type_impl = type_impl
+        type_impl = reference_type._type_impl
+        instance = type_impl(self.memory, address)
 
         self._inflate_struct_instance(instance, reference_type)
 
@@ -100,3 +93,16 @@ class TypeInflater:
             current_offset += annotation.size
 
         instance.size = current_offset
+
+    def _inflate_struct_type(self: TypeInflater, reference_type: type) -> None:
+        if hasattr(reference_type, "_type_impl"):
+            return
+
+        type_impl = type(reference_type.__name__, (struct_impl,), {"_members": {}})
+
+        type_impl._reference_struct = None
+
+        reference_type._type_impl = type_impl
+
+        type_impl._reference_struct = reference_type
+        type_impl._inflater = self
