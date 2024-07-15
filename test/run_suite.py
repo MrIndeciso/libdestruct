@@ -9,11 +9,15 @@ import sys
 from unittest import TestSuite, TextTestRunner, TestLoader
 
 from scripts.basic_test import BasicTest
+from scripts.basic_struct_test import BasicStructTest
+from scripts.string_test import StringTest
 
 def test_suite():
     suite = TestSuite()
 
     suite.addTest(TestLoader().loadTestsFromTestCase(BasicTest))
+    suite.addTest(TestLoader().loadTestsFromTestCase(BasicStructTest))
+    suite.addTest(TestLoader().loadTestsFromTestCase(StringTest))
 
     return suite
 
