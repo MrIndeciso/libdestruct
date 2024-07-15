@@ -18,26 +18,32 @@ class c_str(obj, array):
         size = 0
 
         try:
-            while self.memory[self.address + size] != 0:
+            while self.memory[self.address + size] != b"\x00":
                 size += 1
         except IndexError as e:
             raise RuntimeError("String is not null-terminated.") from e
 
         return size
 
-    def get(self: c_str, index: int) -> bytes:
+    def get(self: c_str, index: int = -1) -> bytes:
         """Return the character at the given index."""
-        if index < 0 or index >= self.size():
+        if index != -1 and index < 0 or index >= self.size():
             raise IndexError("String index out of range.")
+
+        if index == -1:
+            return self.memory[self.address : self.address + self.size()]
 
         return bytes([self.memory[self.address + index]])
 
-    def _set(self: c_str, index: int, value: bytes) -> None:
+    def _set(self: c_str, value: bytes, index: int = -1) -> None:
         """Set the character at the given index to the given value."""
-        if index < 0 or index >= self.size():
+        if index != -1 and index < 0 or index >= self.size():
             raise IndexError("String index out of range.")
 
-        self.memory[self.address + index] = value
+        if index == -1:
+            self.memory[self.address] = value
+        else:
+            self.memory[self.address + index] = value
 
     def __iter__(self: c_str) -> iter:
         """Return an iterator over the string."""
