@@ -22,3 +22,7 @@ class c_ulong(obj):
     def _set(self: c_ulong, value: int) -> None:
         """Set the value of the integer to the given value."""
         self.memory[self.address : self.address + self.size] = value.to_bytes(self.size, self.endianness, signed=False)
+
+    def __int__(self: c_ulong) -> int:
+        """Return the value of the integer."""
+        return self.get()
