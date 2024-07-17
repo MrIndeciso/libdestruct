@@ -13,6 +13,7 @@ from libdestruct.common.obj import obj
 if TYPE_CHECKING:
     from libdestruct.common.struct.struct_impl import struct_impl
 
+
 class struct(obj):
     """A C struct."""
 
@@ -27,4 +28,9 @@ class struct(obj):
 
         type_inflater = inflater(data)
 
-        return type_inflater.inflate_struct(cls, 0)
+        result = type_inflater.inflate_struct(cls, 0)
+
+        if result.size != len(data):
+            raise ValueError("The length of the serialized struct does not match the struct size.")
+
+        return result
