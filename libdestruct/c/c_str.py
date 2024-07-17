@@ -35,6 +35,10 @@ class c_str(obj, array):
 
         return bytes([self.memory[self.address + index]])
 
+    def to_bytes(self: obj) -> bytes:
+        """Return the serialized representation of the object."""
+        return self.memory[self.address : self.address + self.size()]
+
     def _set(self: c_str, value: bytes, index: int = -1) -> None:
         """Set the character at the given index to the given value."""
         if index != -1 and index < 0 or index >= self.size():

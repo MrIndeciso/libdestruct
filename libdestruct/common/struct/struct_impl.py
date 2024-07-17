@@ -56,6 +56,10 @@ class struct_impl(struct):
         """Return the value of the struct."""
         return f"{self.name}(address={self.address}, size={self.size})"
 
+    def to_bytes(self: struct_impl) -> bytes:
+        """Return the serialized representation of the struct."""
+        return b"".join(member.to_bytes() for member in self._members.values())
+
     def _set(self: struct_impl, _: str) -> None:
         """Set the value of the struct to the given value."""
         raise RuntimeError("Cannot set the value of a struct.")

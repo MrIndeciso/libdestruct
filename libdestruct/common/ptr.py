@@ -30,6 +30,13 @@ class ptr(obj):
         """Return the value of the pointer."""
         return int.from_bytes(self.memory[self.address : self.address + self.size], self.endianness)
 
+    def to_bytes(self: obj) -> bytes:
+        """Return the serialized representation of the object."""
+        if self._frozen:
+            return self._frozen_value.to_bytes(self.size, self.endianness)
+
+        return self.memory[self.address : self.address + self.size]
+
     def _set(self: ptr, value: int) -> None:
         """Set the value of the pointer to the given value."""
         self.memory[self.address : self.address + self.size] = value.to_bytes(self.size, self.endianness)

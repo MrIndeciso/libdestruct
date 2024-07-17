@@ -19,6 +19,13 @@ class c_long(obj):
         """Return the value of the integer."""
         return int.from_bytes(self.memory[self.address : self.address + self.size], self.endianness, signed=True)
 
+    def to_bytes(self: obj) -> bytes:
+        """Return the serialized representation of the object."""
+        if self._frozen:
+            return self._frozen_value.to_bytes(self.size, self.endianness, signed=True)
+
+        return self.memory[self.address : self.address + self.size]
+
     def _set(self: c_long, value: int) -> None:
         """Set the value of the integer to the given value."""
         self.memory[self.address : self.address + self.size] = value.to_bytes(self.size, self.endianness, signed=True)

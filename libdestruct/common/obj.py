@@ -63,6 +63,17 @@ class obj(ABC):
     def _set(self: obj, value: object) -> None:
         """Set the value of the object to the given value."""
 
+    @abstractmethod
+    def to_bytes(self: obj) -> bytes:
+        """Serialize the object to bytes."""
+
+    @classmethod
+    def from_bytes(cls, data: bytes) -> obj:
+        """Deserialize the object from bytes."""
+        item = cls(data, 0)
+        item.freeze()
+        return item
+
     def set(self: obj, value: object) -> None:
         """Set the value of the object to the given value."""
         if self._frozen:
@@ -108,3 +119,7 @@ class obj(ABC):
             return False
 
         return self.get() == value.get()
+
+    def __bytes__(self: obj) -> bytes:
+        """Return the serialized object."""
+        return self.to_bytes()

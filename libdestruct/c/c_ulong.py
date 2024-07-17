@@ -19,6 +19,13 @@ class c_ulong(obj):
         """Return the value of the integer."""
         return int.from_bytes(self.memory[self.address : self.address + self.size], self.endianness, signed=False)
 
+    def to_bytes(self: obj) -> bytes:
+        """Return the serialized representation of the object."""
+        if self._frozen:
+            return self._frozen_value.to_bytes(self.size, self.endianness, signed=False)
+
+        return self.memory[self.address : self.address + self.size]
+
     def _set(self: c_ulong, value: int) -> None:
         """Set the value of the integer to the given value."""
         self.memory[self.address : self.address + self.size] = value.to_bytes(self.size, self.endianness, signed=False)
