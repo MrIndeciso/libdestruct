@@ -11,4 +11,4 @@ from libdestruct.common.struct.struct_impl import struct_impl
 __all__ = ["struct", "struct_impl", "ptr_to", "ptr_to_self"]
 
 import libdestruct.common.struct.field_inflater
-import libdestruct.common.struct.struct_inflater
+import libdestruct.common.struct.struct_inflater  # noqa: F401

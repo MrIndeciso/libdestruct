@@ -136,7 +136,7 @@ class struct_impl(struct):
     }}
 }}"""
 
-    def __eq__(self, value: object) -> bool:
+    def __eq__(self: struct_impl, value: object) -> bool:
         """Return whether the struct is equal to the given value."""
         if not isinstance(value, struct_impl):
             return False

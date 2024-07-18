@@ -12,4 +12,4 @@ from libdestruct.c.c_ulong import c_ulong
 
 __all__ = ["c_int", "c_long", "c_str", "c_uint", "c_ulong"]
 
-import libdestruct.c.base_type_inflater
+import libdestruct.c.base_type_inflater  # noqa: F401

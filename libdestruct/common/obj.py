@@ -68,7 +68,7 @@ class obj(ABC):
         """Serialize the object to bytes."""
 
     @classmethod
-    def from_bytes(cls, data: bytes) -> obj:
+    def from_bytes(cls: type[obj], data: bytes) -> obj:
         """Deserialize the object from bytes."""
         item = cls(data, 0)
         item.freeze()
@@ -113,7 +113,7 @@ class obj(ABC):
         """Return a string representation of the object."""
         return f"{self.__class__.__name__}({self.get()})"
 
-    def __eq__(self, value: object) -> bool:
+    def __eq__(self: obj, value: object) -> bool:
         """Return whether the object is equal to the given value."""
         if not isinstance(value, obj):
             return False
