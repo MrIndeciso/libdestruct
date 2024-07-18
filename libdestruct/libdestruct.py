@@ -8,12 +8,12 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from libdestruct.common.type_inflater import TypeInflater
+from libdestruct.common.inflater import Inflater
 
 if TYPE_CHECKING:
     from collections.abc import MutableSequence
 
 
-def inflater(memory: MutableSequence) -> TypeInflater:
+def inflater(memory: MutableSequence) -> Inflater:
     """Return a TypeInflater instance."""
-    return TypeInflater(memory)
+    return Inflater(memory)

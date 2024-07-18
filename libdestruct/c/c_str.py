@@ -6,7 +6,7 @@
 
 from __future__ import annotations
 
-from libdestruct.common.array import array
+from libdestruct.common.array.array import array
 from libdestruct.common.obj import obj
 
 
