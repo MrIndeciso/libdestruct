@@ -6,16 +6,17 @@
 
 from __future__ import annotations
 
-from libdestruct.c.c_int import c_int
-from libdestruct.c.c_long import c_long
+from libdestruct.c.c_integer_types import c_char, c_int, c_long, c_short, c_uchar, c_uint, c_ulong, c_ushort
 from libdestruct.c.c_str import c_str
-from libdestruct.c.c_uint import c_uint
-from libdestruct.c.c_ulong import c_ulong
 from libdestruct.common.type_registry import TypeRegistry
 
 registry = TypeRegistry()
 
 
+registry.register_mapping(c_char, c_char)
+registry.register_mapping(c_uchar, c_uchar)
+registry.register_mapping(c_short, c_short)
+registry.register_mapping(c_ushort, c_ushort)
 registry.register_mapping(c_int, c_int)
 registry.register_mapping(c_uint, c_uint)
 registry.register_mapping(c_long, c_long)

@@ -20,7 +20,7 @@ class obj(ABC):
     """The address of the object in the memory view."""
 
     endianness: str = "little"
-    """The endianness of the backing refenrece view."""
+    """The endianness of the backing reference view."""
 
     memory: MutableSequence
     """The backing memory view."""
@@ -86,6 +86,18 @@ class obj(ABC):
         self._frozen_value = self.get()
         self._frozen = True
 
+    def diff(self: obj) -> tuple[object, object]:
+        """Return the difference between the current value and the frozen value."""
+        return self._frozen_value, self.get()
+
+    def reset(self: obj) -> None:
+        """Reset the object to its frozen value."""
+        self._set(self._frozen_value)
+
+    def update(self: obj) -> None:
+        """Update the object with the given value."""
+        self._frozen_value = self.get()
+
     @property
     def value(self: obj) -> object:
         """Return the value of the object."""
@@ -104,6 +116,10 @@ class obj(ABC):
     def to_str(self: obj, indent: int = 0) -> str:
         """Return a string representation of the object."""
         return f"{' ' * indent}{self.get()}"
+
+    def pdiff(self: obj) -> str:
+        """Return a string representation of the difference between the current value and the frozen value."""
+        return f"{self._frozen_value} -> {self.get()}"
 
     def __str__(self: obj) -> str:
         """Return a string representation of the object."""

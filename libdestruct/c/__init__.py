@@ -4,12 +4,9 @@
 # Licensed under the MIT license. See LICENSE file in the project root for details.
 #
 
-from libdestruct.c.c_int import c_int
-from libdestruct.c.c_long import c_long
+from libdestruct.c.c_integer_types import c_char, c_int, c_long, c_short, c_uchar, c_uint, c_ulong, c_ushort
 from libdestruct.c.c_str import c_str
-from libdestruct.c.c_uint import c_uint
-from libdestruct.c.c_ulong import c_ulong
 
-__all__ = ["c_int", "c_long", "c_str", "c_uint", "c_ulong"]
+__all__ = ["c_char", "c_uchar", "c_short", "c_ushort", "c_int", "c_uint", "c_long", "c_ulong", "c_str"]
 
 import libdestruct.c.base_type_inflater  # noqa: F401
