@@ -6,10 +6,12 @@
 
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
+from abc import abstractmethod
+
+from libdestruct.common.obj import obj
 
 
-class array(ABC):
+class array(obj):
     """An array of objects."""
 
     @abstractmethod

@@ -4,35 +4,34 @@
 # Licensed under the MIT license. See LICENSE file in the project root for details.
 #
 
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from libdestruct.common.struct.ptr_struct_field import PtrStructField
+from libdestruct.common.array.linear_array_field import LinearArrayField
 from libdestruct.common.struct.struct import struct
 from libdestruct.common.struct.struct_impl import struct_impl
 from libdestruct.common.type_registry import TypeRegistry
 
 if TYPE_CHECKING:
+    from collections.abc import Callable, MutableSequence
+
     from libdestruct.common.obj import obj
 
 registry = TypeRegistry()
 
 
-def inflate_ptr_field(
-    field: PtrStructField,
+def linear_array_field_inflater(
+    field: LinearArrayField,
     _: type[obj],
-    owner: tuple[obj, type[obj]] | None,
-) -> obj:
-    """Inflate a field of a struct that has an associated generator."""
-    if not field.backing_type:
-        if owner:
-            _, owner_type = owner
-            field.backing_type = owner_type
-    elif issubclass(field.backing_type, struct) and not issubclass(field.backing_type, struct_impl):
-        field.backing_type = registry.inflater_for(field.backing_type)
+    __: tuple[obj, type[obj]] | None,
+) -> Callable[[MutableSequence, int | tuple[obj, int]], obj]:
+    """Returns the inflater for an array field of a struct."""
+    if issubclass(field.item, struct) and not issubclass(field.item, struct_impl):
+        field.item = registry.inflater_for(field.item)
 
     return field.inflate
 
 
-registry.register_instance_handler(PtrStructField, inflate_ptr_field)
+registry.register_instance_handler(LinearArrayField, linear_array_field_inflater)

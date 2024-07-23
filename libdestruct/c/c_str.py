@@ -7,10 +7,9 @@
 from __future__ import annotations
 
 from libdestruct.common.array.array import array
-from libdestruct.common.obj import obj
 
 
-class c_str(obj, array):
+class c_str(array):
     """A C string."""
 
     def size(self: c_str) -> int:
@@ -35,7 +34,7 @@ class c_str(obj, array):
 
         return bytes([self.memory[self.address + index]])
 
-    def to_bytes(self: obj) -> bytes:
+    def to_bytes(self: c_str) -> bytes:
         """Return the serialized representation of the object."""
         return self.memory[self.address : self.address + self.size()]
 

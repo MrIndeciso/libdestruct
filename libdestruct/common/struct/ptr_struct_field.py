@@ -28,6 +28,6 @@ class PtrStructField(StructField):
         """
         self.backing_type = backing_type
 
-    def inflate(self: PtrStructField, memory: MutableSequence, address: int) -> obj:
+    def inflate(self: PtrStructField, memory: MutableSequence, address: int | tuple[obj, int]) -> obj:
         """Inflate the field."""
         return ptr(memory, address, self.backing_type)

@@ -12,14 +12,15 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import MutableSequence
 
+    from libdestruct.common.array import array
     from libdestruct.common.obj import obj
 
 
-class StructField(ABC):
-    """A generator for a field of a struct."""
+class ArrayField(ABC):
+    """A generator for an array of items."""
 
     @abstractmethod
-    def inflate(self: StructField, memory: MutableSequence, address: int | tuple[obj, int]) -> obj:
+    def inflate(self: ArrayField, memory: MutableSequence, address: int | tuple[obj, int]) -> array:
         """Inflate the field.
 
         Args:
