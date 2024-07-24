@@ -15,8 +15,6 @@ from libdestruct.common.type_registry import TypeRegistry
 if TYPE_CHECKING:
     from collections.abc import MutableSequence
 
-    from libdestruct.common.obj import obj
-
 
 class struct_impl(struct):
     """The implementation for the C struct type."""
