@@ -15,6 +15,9 @@ registry = TypeRegistry()
 
 def inflate_struct_type(reference_type: type[struct]) -> type[struct_impl]:
     """Inflate a struct type."""
+    if issubclass(reference_type, struct_impl):
+        return reference_type
+
     type_impl = type(reference_type.__name__, (struct_impl,), {"_members": {}})
     type_impl._reference_struct = reference_type
 
@@ -26,3 +29,4 @@ def inflate_struct_type(reference_type: type[struct]) -> type[struct_impl]:
 
 
 registry.register_type_handler(struct, inflate_struct_type)
+registry.register_type_handler(struct_impl, inflate_struct_type)

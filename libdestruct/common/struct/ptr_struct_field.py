@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from libdestruct.common.field import Field
 from libdestruct.common.ptr import ptr
 from libdestruct.common.struct.struct_field import StructField
 
@@ -20,7 +21,7 @@ if TYPE_CHECKING:
 class PtrStructField(StructField):
     """A generator for a field of a struct."""
 
-    def __init__(self: PtrStructField, backing_type: type) -> None:
+    def __init__(self: PtrStructField, backing_type: type | Field) -> None:
         """Initialize a pointer field.
 
         Args:
@@ -30,4 +31,7 @@ class PtrStructField(StructField):
 
     def inflate(self: PtrStructField, memory: MutableSequence, address: int | tuple[obj, int]) -> obj:
         """Inflate the field."""
+        if isinstance(self.backing_type, Field):
+            return ptr(memory, address, self.backing_type.inflate)
+
         return ptr(memory, address, self.backing_type)

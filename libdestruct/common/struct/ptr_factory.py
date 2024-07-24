@@ -11,10 +11,11 @@ from typing import TYPE_CHECKING
 from libdestruct.common.struct.ptr_struct_field import PtrStructField
 
 if TYPE_CHECKING:
+    from libdestruct.common.field import Field
     from libdestruct.common.obj import obj
 
 
-def ptr_to(item: obj) -> PtrStructField:
+def ptr_to(item: obj | Field) -> PtrStructField:
     """Crafts a struct member which is a pointer to an object."""
     return PtrStructField(item)
 

@@ -14,15 +14,15 @@ from libdestruct.common.field import Field
 if TYPE_CHECKING:
     from collections.abc import MutableSequence
 
-    from libdestruct.common.array import array
+    from libdestruct.common.enum import enum
     from libdestruct.common.obj import obj
 
 
-class ArrayField(Field):
-    """A generator for an array of items."""
+class EnumField(Field):
+    """A generator for an enum."""
 
     @abstractmethod
-    def inflate(self: ArrayField, memory: MutableSequence, address: int | tuple[obj, int]) -> array:
+    def inflate(self: EnumField, memory: MutableSequence, address: int | tuple[obj, int]) -> enum:
         """Inflate the field.
 
         Args:

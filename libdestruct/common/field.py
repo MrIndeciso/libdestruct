@@ -6,23 +6,19 @@
 
 from __future__ import annotations
 
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
-
-from libdestruct.common.field import Field
 
 if TYPE_CHECKING:
     from collections.abc import MutableSequence
 
-    from libdestruct.common.array import array
     from libdestruct.common.obj import obj
 
-
-class ArrayField(Field):
-    """A generator for an array of items."""
+class Field(ABC):
+    """A generator for a generic field."""
 
     @abstractmethod
-    def inflate(self: ArrayField, memory: MutableSequence, address: int | tuple[obj, int]) -> array:
+    def inflate(self: Field, memory: MutableSequence, address: int | tuple[obj, int]) -> obj:
         """Inflate the field.
 
         Args:

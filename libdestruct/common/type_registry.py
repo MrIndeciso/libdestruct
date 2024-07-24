@@ -8,6 +8,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from libdestruct.common.field import Field
+
 if TYPE_CHECKING:
     from collections.abc import Callable, MutableSequence
 
@@ -49,7 +51,7 @@ class TypeRegistry:
 
     def inflater_for(
         self: TypeRegistry,
-        item: type[obj] | tuple[object, type[obj]],
+        item: type[obj] | Field | tuple[object, type[obj]],
         owner: tuple[obj, type[obj]] | None = None,
     ) -> type[obj]:
         """Return the inflater for the given object type.
@@ -83,10 +85,18 @@ class TypeRegistry:
 
     def _inflater_for_instance(
         self: TypeRegistry,
-        instance: tuple[object, type[obj]],
+        instance: Field | tuple[object, type[obj]],
         owner: tuple[obj, type[obj]] | None,
     ) -> Callable[[MutableSequence, int | tuple[obj, int]], obj]:
-        item, annotation = instance
+        # Check if instance is already the bound method of an inflater. If so, just return it, as we resolved it already
+        if callable(instance) and hasattr(instance, "__self__") and isinstance(instance.__self__, Field):
+            return instance
+
+        if isinstance(instance, tuple):
+            item, annotation = instance
+        else:
+            item, annotation = instance, None
+
         base = item.__class__
 
         for handler in self.instance_handlers.get(base, []):

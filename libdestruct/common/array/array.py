@@ -30,10 +30,6 @@ class array(obj):
         """Return the element at the given index."""
         return self.get(index)
 
-    @abstractmethod
-    def set(self: array, index: int, value: object) -> None:
-        """Set the element at the given index to the given value."""
-
     def __setitem__(self: array, index: int, value: object) -> None:
         """Set the element at the given index to the given value."""
         self.set(index, value)

@@ -6,6 +6,7 @@
 
 from __future__ import annotations
 
+from libdestruct.common.field import Field
 from libdestruct.common.obj import obj
 
 
@@ -78,10 +79,17 @@ class ptr(obj):
 
     def to_str(self: ptr, indent: int = 0) -> str:
         """Return a string representation of the pointer."""
-        if self.wrapper:
-            return f"{' ' * indent}{self.wrapper.__name__}@0x{self.get():x}"
+        if not self.wrapper:
+            return f"{' ' * indent}ptr@0x{self.get():x}"
 
-        return f"{' ' * indent}ptr@0x{self.get():x}"
+        # Pretty print inflaters:
+        if callable(self.wrapper) and hasattr(self.wrapper, "__self__") and isinstance(self.wrapper.__self__, Field):
+            name = self.wrapper.__self__.__class__.__qualname__
+        else:
+            name = self.wrapper.__name__
+
+        return f"{' ' * indent}{name}@0x{self.get():x}"
+
 
     def __str__(self: ptr) -> str:
         """Return a string representation of the pointer."""

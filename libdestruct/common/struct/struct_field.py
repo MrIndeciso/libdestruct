@@ -6,8 +6,10 @@
 
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from typing import TYPE_CHECKING
+
+from libdestruct.common.field import Field
 
 if TYPE_CHECKING:
     from collections.abc import MutableSequence
@@ -15,7 +17,7 @@ if TYPE_CHECKING:
     from libdestruct.common.obj import obj
 
 
-class StructField(ABC):
+class StructField(Field):
     """A generator for a field of a struct."""
 
     @abstractmethod

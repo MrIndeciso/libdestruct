@@ -31,17 +31,10 @@ class array_impl(array):
         count: int,
     ) -> None:
         """Initialize the array."""
-        self.memory = memory
+        super().__init__(memory, address)
+
         self.backing_type = backing_type
         self.count = count
-
-        if isinstance(address, tuple):
-            self._address = None
-            self._reference = address[0]
-            self._offset = address[1]
-        else:
-            self._address = address
-
         self.size = self.backing_type.size * self.count
 
     def size(self: array_impl) -> int:

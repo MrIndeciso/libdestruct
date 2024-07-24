@@ -35,16 +35,10 @@ class struct_impl(struct):
 
     def __init__(self: struct_impl, memory: MutableSequence, address: int | tuple[obj, int]) -> None:
         """Initialize the struct implementation."""
+        # array overrides the __init__ method, so we need to call the parent class __init__ method
+        obj.__init__(self, memory, address)
+
         self.name = self.__class__.__name__
-        self.memory = memory
-
-        if isinstance(address, tuple):
-            self._address = None
-            self._reference = address[0]
-            self._offset = address[1]
-        else:
-            self._address = address
-
         self.size = 0
         self._members = {}
 

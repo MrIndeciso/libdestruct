@@ -14,7 +14,23 @@ except ImportError:
 from libdestruct.c import c_int, c_long, c_str, c_uint, c_ulong
 from libdestruct.common import ptr
 from libdestruct.common.array import array, array_of
+from libdestruct.common.enum import enum, enum_of
 from libdestruct.common.struct import ptr_to, ptr_to_self, struct
 from libdestruct.libdestruct import inflater
 
-__all__ = ["array", "array_of", "c_int", "c_long", "c_str", "c_uint", "c_ulong", "inflater", "struct", "ptr", "ptr_to", "ptr_to_self"]
+__all__ = [
+    "array",
+    "array_of",
+    "c_int",
+    "c_long",
+    "c_str",
+    "c_uint",
+    "c_ulong",
+    "enum",
+    "enum_of",
+    "inflater",
+    "struct",
+    "ptr",
+    "ptr_to",
+    "ptr_to_self",
+]
