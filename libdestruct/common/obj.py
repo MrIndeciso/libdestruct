@@ -10,20 +10,17 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from collections.abc import MutableSequence
+    from libdestruct.backing.resolver import Resolver
 
 
 class obj(ABC):
     """A generic object, with reference to the backing memory view."""
 
-    address: int
-    """The address of the object in the memory view."""
-
     endianness: str = "little"
     """The endianness of the backing reference view."""
 
-    memory: MutableSequence
-    """The backing memory view."""
+    resolver: Resolver
+    """The backing storage that resolves to this instance of a type."""
 
     _frozen: bool = False
     """Whether the object is frozen."""
@@ -31,29 +28,18 @@ class obj(ABC):
     _frozen_value: object = None
     """The frozen value of the object."""
 
-    def __init__(self: obj, memory: MutableSequence, address: int | tuple[obj, int]) -> None:
+    def __init__(self: obj, resolver: Resolver) -> None:
         """Initialize a generic object.
 
         Args:
-            memory: The backing memory view.
-            address: The address of the object in the memory view
+            resolver: The resolver for the value of this object.
         """
-        self.memory = memory
-
-        if isinstance(address, tuple):
-            self._address = None
-            self._reference = address[0]
-            self._offset = address[1]
-        else:
-            self._address = address
+        self.resolver = resolver
 
     @property
     def address(self: obj) -> int:
         """Return the address of the object in the memory view."""
-        if self._address is not None:
-            return self._address
-
-        return self._reference.address + self._offset
+        return self.resolver.resolve_address()
 
     @abstractmethod
     def get(self: obj) -> object:

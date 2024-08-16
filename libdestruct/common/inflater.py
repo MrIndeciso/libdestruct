@@ -8,11 +8,13 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from libdestruct.backing.memory_resolver import MemoryResolver
 from libdestruct.common.type_registry import TypeRegistry
 
 if TYPE_CHECKING:
     from collections.abc import MutableSequence
 
+    from libdestruct.backing.resolver import Resolver
     from libdestruct.common.obj import obj
 
 
@@ -24,7 +26,7 @@ class Inflater:
         self.memory = memory
         self.type_registry = TypeRegistry()
 
-    def inflate(self: Inflater, item: type, address: int | tuple[obj, int]) -> obj:
+    def inflate(self: Inflater, item: type, address: int | Resolver) -> obj:
         """Inflate a memory-referencing type.
 
         Args:
@@ -34,4 +36,8 @@ class Inflater:
         Returns:
             The inflated object.
         """
-        return self.type_registry.inflater_for(item)(self.memory, address)
+        if isinstance(address, int):
+            # Create a memory resolver from the address
+            address = MemoryResolver(self.memory, address)
+
+        return self.type_registry.inflater_for(item)(address)

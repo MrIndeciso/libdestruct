@@ -6,8 +6,13 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from libdestruct.common.field import Field
 from libdestruct.common.obj import obj
+
+if TYPE_CHECKING:
+    from libdestruct.backing.resolver import Resolver
 
 
 class ptr(obj):
@@ -16,31 +21,31 @@ class ptr(obj):
     size: int = 8
     """The size of a pointer in bytes."""
 
-    def __init__(self: ptr, memory: bytearray, address: int, wrapper: type | None = None) -> None:
+    def __init__(self: ptr, resolver: Resolver, wrapper: type | None = None) -> None:
         """Initialize a pointer.
 
         Args:
-            memory: The backing memory view.
-            address: The address of the pointer in the memory view.
+            resolver: The backing value resolver.
             wrapper: The object this pointer points to.
         """
-        super().__init__(memory, address)
+        super().__init__(resolver)
         self.wrapper = wrapper
 
     def get(self: ptr) -> int:
         """Return the value of the pointer."""
-        return int.from_bytes(self.memory[self.address : self.address + self.size], self.endianness)
+        value = self.resolver.resolve(self.size, 0)
+        return int.from_bytes(value, self.endianness)
 
     def to_bytes(self: obj) -> bytes:
         """Return the serialized representation of the object."""
         if self._frozen:
             return self._frozen_value.to_bytes(self.size, self.endianness)
 
-        return self.memory[self.address : self.address + self.size]
+        return self.resolver.resolve(self.size, 0)
 
     def _set(self: ptr, value: int) -> None:
         """Set the value of the pointer to the given value."""
-        self.memory[self.address : self.address + self.size] = value.to_bytes(self.size, self.endianness)
+        self.resolver.modify(self.size, 0, value.to_bytes(self.size, self.endianness))
 
     def unwrap(self: ptr, length: int | None = None) -> obj:
         """Return the object pointed to by the pointer.
@@ -54,12 +59,12 @@ class ptr(obj):
             if length:
                 raise ValueError("Length is not supported when unwrapping a pointer to a wrapper object.")
 
-            return self.wrapper(self.memory, address)
+            return self.wrapper(self.resolver.absolute_from_own(address))
 
         if not length:
             length = 1
 
-        return self.memory[address : address + length]
+        return self.resolver.resolve(length, 0)
 
     def try_unwrap(self: ptr, length: int | None = None) -> obj | None:
         """Return the object pointed to by the pointer, if it is valid.
@@ -71,7 +76,7 @@ class ptr(obj):
 
         try:
             # If the address is invalid, this will raise an IndexError or ValueError.
-            self.memory[address]
+            self.resolver.absolute_from_own(address).resolve(length)
         except (IndexError, ValueError):
             return None
 
@@ -89,7 +94,6 @@ class ptr(obj):
             name = self.wrapper.__name__
 
         return f"{' ' * indent}{name}@0x{self.get():x}"
-
 
     def __str__(self: ptr) -> str:
         """Return a string representation of the pointer."""

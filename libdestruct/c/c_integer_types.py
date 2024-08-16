@@ -23,21 +23,25 @@ class _c_integer(obj):
 
     def get(self: _c_integer) -> int:
         """Return the value of the integer."""
-        return int.from_bytes(self.memory[self.address : self.address + self.size], self.endianness, signed=self.signed)
+        return int.from_bytes(self.resolver.resolve(self.size, 0), self.endianness, signed=self.signed)
 
     def to_bytes(self: _c_integer) -> bytes:
         """Return the serialized representation of the object."""
         if self._frozen:
             return self._frozen_value.to_bytes(self.size, self.endianness, signed=self.signed)
 
-        return self.memory[self.address : self.address + self.size]
+        return self.resolver.resolve(self.size, 0)
 
     def _set(self: _c_integer, value: int) -> None:
         """Set the value of the integer to the given value."""
-        self.memory[self.address : self.address + self.size] = value.to_bytes(
+        self.resolver.modify(
             self.size,
-            self.endianness,
-            signed=self.signed,
+            0,
+            value.to_bytes(
+                self.size,
+                self.endianness,
+                signed=self.signed,
+            ),
         )
 
     def __int__(self: _c_integer) -> int:

@@ -13,7 +13,7 @@ from libdestruct.common.struct import struct
 from libdestruct.common.type_registry import TypeRegistry
 
 if TYPE_CHECKING:
-    from collections.abc import MutableSequence
+    from libdestruct.backing.resolver import Resolver
 
 
 class struct_impl(struct):
@@ -31,22 +31,22 @@ class struct_impl(struct):
     _inflater: TypeRegistry = TypeRegistry()
     """The type registry, used for inflating the attributes."""
 
-    def __init__(self: struct_impl, memory: MutableSequence, address: int | tuple[obj, int]) -> None:
+    def __init__(self: struct_impl, resolver: Resolver) -> None:
         """Initialize the struct implementation."""
         # array overrides the __init__ method, so we need to call the parent class __init__ method
-        obj.__init__(self, memory, address)
+        obj.__init__(self, resolver)
 
         self.name = self.__class__.__name__
         self.size = 0
         self._members = {}
 
         reference_type = self._reference_struct
-        self._inflate_struct_attributes(self._inflater, memory, reference_type)
+        self._inflate_struct_attributes(self._inflater, resolver, reference_type)
 
     def _inflate_struct_attributes(
         self: struct_impl,
         inflater: TypeRegistry,
-        memory: MutableSequence,
+        resolver: Resolver,
         reference_type: type,
     ) -> None:
         current_offset = 0
@@ -59,7 +59,7 @@ class struct_impl(struct):
             else:
                 resolved_type = inflater.inflater_for(annotation)
 
-            result = resolved_type(memory, (self, current_offset))
+            result = resolved_type(resolver.relative_from_own(current_offset, 0))
             setattr(self, name, result)
             self._members[name] = result
             current_offset += result.size
@@ -73,7 +73,7 @@ class struct_impl(struct):
             if name in reference_type.__dict__:
                 # Field associated with the annotation
                 field = getattr(reference_type, name)
-                attribute = cls._inflater.inflater_for((field, annotation))(None, 0)
+                attribute = cls._inflater.inflater_for((field, annotation))(None)
                 size += attribute.size
             else:
                 attribute = cls._inflater.inflater_for(annotation)

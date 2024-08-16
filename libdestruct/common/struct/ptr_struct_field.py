@@ -13,8 +13,7 @@ from libdestruct.common.ptr import ptr
 from libdestruct.common.struct.struct_field import StructField
 
 if TYPE_CHECKING:
-    from collections.abc import MutableSequence
-
+    from libdestruct.backing.resolver import Resolver
     from libdestruct.common.obj import obj
 
 
@@ -29,9 +28,9 @@ class PtrStructField(StructField):
         """
         self.backing_type = backing_type
 
-    def inflate(self: PtrStructField, memory: MutableSequence, address: int | tuple[obj, int]) -> obj:
+    def inflate(self: PtrStructField, resolver: Resolver) -> obj:
         """Inflate the field."""
         if isinstance(self.backing_type, Field):
-            return ptr(memory, address, self.backing_type.inflate)
+            return ptr(resolver, self.backing_type.inflate)
 
-        return ptr(memory, address, self.backing_type)
+        return ptr(resolver, self.backing_type)
