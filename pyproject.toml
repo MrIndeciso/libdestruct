@@ -29,7 +29,7 @@ classifiers = [
     "Typing :: Typed",
 ]
 keywords = ["struct", "c", "debugger", "memory", "reverse", "rev", "reverse-engineering", "script", "libdebug"]
-dependencies = []
+dependencies = ["typing_extensions"]
 
 [project.optional-dependencies]
 dev = [
