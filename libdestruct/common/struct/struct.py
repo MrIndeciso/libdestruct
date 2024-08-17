@@ -27,9 +27,4 @@ class struct(obj):
         """Create a struct from a serialized representation."""
         type_inflater = inflater(data)
 
-        result = type_inflater.inflate(cls, 0)
-
-        if result.size != len(data):
-            raise ValueError("The length of the serialized struct does not match the struct size.")
-
-        return result
+        return type_inflater.inflate(cls, 0)

@@ -265,3 +265,26 @@ class BasicStructTest(unittest.TestCase):
 
         d.kill()
         d.terminate()
+
+    def test_struct_from_bytes(self):
+        class test_t(struct):
+            a: c_int
+            b: c_long
+            c: ptr = ptr_to_self()
+
+        memory = b""
+        memory += (1337).to_bytes(4, "little")
+        memory += (13371337).to_bytes(8, "little")
+        memory += (4 + 8 + 8).to_bytes(8, "little")
+        memory += (1234).to_bytes(4, "little")
+        memory += (12345678).to_bytes(8, "little")
+        memory += (0).to_bytes(8, "little")
+
+        test = test_t.from_bytes(memory)
+
+        assert test.a.value == 1337
+        assert test.b.value == 13371337
+        assert test.c.unwrap().a.value == 1234
+        assert test.c.unwrap().b.value == 12345678
+        assert test.address == 0x0
+        assert test.c.unwrap().address == (4 + 8 + 8)
