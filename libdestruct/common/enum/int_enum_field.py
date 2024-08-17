@@ -15,6 +15,8 @@ from libdestruct.common.enum.enum_field import EnumField
 if TYPE_CHECKING:
     from enum import IntEnum
 
+    from libdestruct.backing.resolver import Resolver
+
 
 class IntEnumField(EnumField):
     """A generator for an enum of integers."""
@@ -45,11 +47,10 @@ class IntEnumField(EnumField):
             case _:
                 raise ValueError("The size of the field must be a power of 2.")
 
-    def inflate(self: IntEnumField, memory: bytearray, address: int) -> int:
+    def inflate(self: IntEnumField, resolver: Resolver) -> int:
         """Inflate the field.
 
         Args:
-            memory: The backing memory view.
-            address: The address of the field in the memory view.
+            resolver: The backing resolver for the object.
         """
-        return enum(memory, address, self.enum, self.backing_type, self.lenient)
+        return enum(resolver, self.enum, self.backing_type, self.lenient)

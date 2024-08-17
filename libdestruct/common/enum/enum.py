@@ -12,8 +12,9 @@ from libdestruct.common.obj import obj
 from libdestruct.common.type_registry import TypeRegistry
 
 if TYPE_CHECKING:
-    from collections.abc import MutableSequence
     from enum import Enum
+
+    from libdestruct.backing.resolver import Resolver
 
 
 class enum(obj):
@@ -30,17 +31,16 @@ class enum(obj):
 
     def __init__(
         self: enum,
-        memory: MutableSequence,
-        address: int | tuple[obj, int],
+        resolver: Resolver,
         python_enum: type[Enum],
         backing_type: type[obj],
         lenient: bool = True,
     ) -> None:
         """Initialize the enum object."""
-        super().__init__(memory, address)
+        super().__init__(resolver)
 
         self.python_enum = python_enum
-        self._backing_type = TypeRegistry().inflater_for(backing_type)(memory, address)
+        self._backing_type = TypeRegistry().inflater_for(backing_type)(resolver)
         self.lenient = lenient
 
         self.size = self._backing_type.size

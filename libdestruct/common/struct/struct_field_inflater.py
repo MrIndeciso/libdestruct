@@ -12,8 +12,9 @@ from libdestruct.common.struct.ptr_struct_field import PtrStructField
 from libdestruct.common.type_registry import TypeRegistry
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, MutableSequence
+    from collections.abc import Callable
 
+    from libdestruct.backing.resolver import Resolver
     from libdestruct.common.obj import obj
 
 registry = TypeRegistry()
@@ -23,7 +24,7 @@ def ptr_field_inflater(
     field: PtrStructField,
     _: type[obj],
     owner: tuple[obj, type[obj]] | None,
-) -> Callable[[MutableSequence, int | tuple[obj, int]], obj]:
+) -> Callable[[Resolver], obj]:
     """Returns the inflated for a field of a struct that has an associated generator."""
     if not field.backing_type and owner:
         _, owner_type = owner

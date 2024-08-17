@@ -10,18 +10,17 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from collections.abc import MutableSequence
-
+    from libdestruct.backing.resolver import Resolver
     from libdestruct.common.obj import obj
+
 
 class Field(ABC):
     """A generator for a generic field."""
 
     @abstractmethod
-    def inflate(self: Field, memory: MutableSequence, address: int | tuple[obj, int]) -> obj:
+    def inflate(self: Field, resolver: Resolver) -> obj:
         """Inflate the field.
 
         Args:
-            memory: The backing memory view.
-            address: The address of the field in the memory view.
+            resolver: The backing resolver for the object.
         """

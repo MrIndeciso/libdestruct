@@ -13,8 +13,9 @@ from libdestruct.common.array.linear_array_field import LinearArrayField
 from libdestruct.common.type_registry import TypeRegistry
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, MutableSequence
+    from collections.abc import Callable
 
+    from libdestruct.backing.resolver import Resolver
     from libdestruct.common.obj import obj
 
 registry = TypeRegistry()
@@ -24,7 +25,7 @@ def linear_array_field_inflater(
     field: LinearArrayField,
     _: type[obj],
     __: tuple[obj, type[obj]] | None,
-) -> Callable[[MutableSequence, int | tuple[obj, int]], obj]:
+) -> Callable[[Resolver], obj]:
     """Returns the inflater for an array field of a struct."""
     field.item = registry.inflater_for(field.item)
 

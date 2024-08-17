@@ -11,10 +11,11 @@ from typing import TYPE_CHECKING
 from libdestruct.common.field import Field
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, MutableSequence
+    from collections.abc import Callable
 
     from typing_extensions import Self
 
+    from libdestruct.backing.resolver import Resolver
     from libdestruct.common.obj import obj
 
 
@@ -32,7 +33,7 @@ class TypeRegistry:
         list[
             Callable[
                 [object, type[obj], tuple[obj, type[obj]] | None],
-                Callable[[MutableSequence, int | tuple[obj, int]], obj] | None,
+                Callable[[Resolver], obj] | None,
             ]
         ],
     ]
@@ -87,7 +88,7 @@ class TypeRegistry:
         self: TypeRegistry,
         instance: Field | tuple[object, type[obj]],
         owner: tuple[obj, type[obj]] | None,
-    ) -> Callable[[MutableSequence, int | tuple[obj, int]], obj]:
+    ) -> Callable[[Resolver], obj]:
         # Check if instance is already the bound method of an inflater. If so, just return it, as we resolved it already
         if callable(instance) and hasattr(instance, "__self__") and isinstance(instance.__self__, Field):
             return instance
@@ -129,7 +130,7 @@ class TypeRegistry:
         parent: type,
         handler: Callable[
             [object, type[obj], tuple[obj, type[obj]] | None],
-            Callable[[MutableSequence, int | tuple[obj, int]], obj] | None,
+            Callable[[Resolver], obj] | None,
         ],
     ) -> None:
         """Register a handler for an instance.

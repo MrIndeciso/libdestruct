@@ -12,8 +12,7 @@ from typing import TYPE_CHECKING
 from libdestruct.common.field import Field
 
 if TYPE_CHECKING:
-    from collections.abc import MutableSequence
-
+    from libdestruct.backing.resolver import Resolver
     from libdestruct.common.obj import obj
 
 
@@ -21,10 +20,9 @@ class StructField(Field):
     """A generator for a field of a struct."""
 
     @abstractmethod
-    def inflate(self: StructField, memory: MutableSequence, address: int | tuple[obj, int]) -> obj:
+    def inflate(self: StructField, resolver: Resolver) -> obj:
         """Inflate the field.
 
         Args:
-            memory: The backing memory view.
-            address: The address of the field in the memory view.
+            resolver: The backing resolver for the object.
         """

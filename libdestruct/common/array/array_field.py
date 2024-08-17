@@ -12,20 +12,17 @@ from typing import TYPE_CHECKING
 from libdestruct.common.field import Field
 
 if TYPE_CHECKING:
-    from collections.abc import MutableSequence
-
+    from libdestruct.backing.resolver import Resolver
     from libdestruct.common.array import array
-    from libdestruct.common.obj import obj
 
 
 class ArrayField(Field):
     """A generator for an array of items."""
 
     @abstractmethod
-    def inflate(self: ArrayField, memory: MutableSequence, address: int | tuple[obj, int]) -> array:
+    def inflate(self: ArrayField, resolver: Resolver) -> array:
         """Inflate the field.
 
         Args:
-            memory: The backing memory view.
-            address: The address of the field in the memory view.
+            resolver: The backing resolver for the object.
         """

@@ -12,6 +12,7 @@ from libdestruct.common.array.array_field import ArrayField
 from libdestruct.common.array.array_impl import array_impl
 
 if TYPE_CHECKING:
+    from libdestruct.backing.resolver import Resolver
     from libdestruct.common.array.array import array
     from libdestruct.common.obj import obj
 
@@ -24,11 +25,10 @@ class LinearArrayField(ArrayField):
         self.item = item
         self.size = size
 
-    def inflate(self: LinearArrayField, memory: list, address: int | tuple[obj, int]) -> array:
+    def inflate(self: LinearArrayField, resolver: Resolver) -> array:
         """Inflate the field.
 
         Args:
-            memory: The backing memory view.
-            address: The address of the field in the memory view.
+            resolver: The backing resolver for the object.
         """
-        return array_impl(memory, address, self.item, self.size)
+        return array_impl(resolver, self.item, self.size)

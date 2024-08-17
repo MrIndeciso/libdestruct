@@ -12,8 +12,9 @@ from libdestruct.common.array.array import array
 from libdestruct.common.obj import obj
 
 if TYPE_CHECKING:
-    from collections.abc import Generator, MutableSequence
+    from collections.abc import Generator
 
+    from libdestruct.backing.resolver import Resolver
     from libdestruct.common.obj import obj
 
 
@@ -25,13 +26,12 @@ class array_impl(array):
 
     def __init__(
         self: array_impl,
-        memory: MutableSequence,
-        address: int | tuple[obj, int],
+        resolver: Resolver,
         backing_type: obj,
         count: int,
     ) -> None:
         """Initialize the array."""
-        super().__init__(memory, address)
+        super().__init__(resolver)
 
         self.backing_type = backing_type
         self.count = count
@@ -59,10 +59,7 @@ class array_impl(array):
 
     def __getitem__(self: array_impl, index: int) -> obj:
         """Get an item from the array."""
-        if self._address:
-            return self.backing_type(self.memory, (self._address, index * self.backing_type.size))
-
-        return self.backing_type(self.memory, (self._reference, self._offset + index * self.backing_type.size))
+        return self.backing_type(self.resolver.relative_from_own(index * self.backing_type.size, 0))
 
     def __setitem__(self: array_impl, index: int, value: obj) -> None:
         """Set an item in the array."""
