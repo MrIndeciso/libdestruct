@@ -74,15 +74,24 @@ class obj(ABC):
 
     def diff(self: obj) -> tuple[object, object]:
         """Return the difference between the current value and the frozen value."""
-        return self._frozen_value, self.get()
+        try:
+            return self._frozen_value, self.get()
+        except ValueError as e:
+            raise RuntimeError("Could not calculate the diff the object.") from e
 
     def reset(self: obj) -> None:
         """Reset the object to its frozen value."""
-        self._set(self._frozen_value)
+        try:
+            self._set(self._frozen_value)
+        except ValueError as e:
+            raise RuntimeError("Could not reset the object to its frozen value.") from e
 
     def update(self: obj) -> None:
         """Update the object with the given value."""
-        self._frozen_value = self.get()
+        try:
+            self._frozen_value = self.get()
+        except ValueError as e:
+            raise RuntimeError("Could not update the object.") from e
 
     @property
     def value(self: obj) -> object:
