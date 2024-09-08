@@ -21,12 +21,18 @@ class ArrayTest(unittest.TestCase):
 
         libdestruct = inflater(d.memory)
 
-        assert bp.hit_on(d)
+        self.assertTrue(bp.hit_on(d))
 
         test1 = libdestruct.inflate(array_of(c_int, 10), d.regs.rdi)
 
+        self.assertEqual(len(test1), 10)
+
         for i in range(10):
-            assert test1[i].value == i ** 2
+            self.assertEqual(test1[i].value, i ** 2)
+
+        self.assertEqual(bytes(test1), b"".join((i ** 2).to_bytes(4, "little") for i in range(10)))
+
+        self.assertIn(test1[0], test1)
 
         d.cont()
 
@@ -36,7 +42,7 @@ class ArrayTest(unittest.TestCase):
         test2 = libdestruct.inflate(array_of(test2_t, 10), d.regs.rdi)
 
         for i in range(10):
-            assert test2[i].a.value == i ** 3
+            self.assertEqual(test2[i].a.value, i ** 3)
 
         d.cont()
 
@@ -47,8 +53,8 @@ class ArrayTest(unittest.TestCase):
         test3 = libdestruct.inflate(array_of(test3_t, 10), d.regs.rdi)
 
         for i in range(10):
-            assert test3[i].a.value == i * 100
-            assert test3[i].b.value == i * 1000
+            self.assertEqual(test3[i].a.value, i * 100)
+            self.assertEqual(test3[i].b.value, i * 1000)
 
         d.cont()
 
@@ -59,9 +65,18 @@ class ArrayTest(unittest.TestCase):
         test4 = libdestruct.inflate(array_of(test4_t, 10), d.regs.rdi)
 
         for i in range(10):
-            assert test4[i].a.value == i ** 4
+            self.assertEqual(test4[i].a.value, i ** 4)
             for j in range(10):
-                assert test4[i].b[j].value == (i + 1) * j
+                self.assertEqual(test4[i].b[j].value, (i + 1) * j)
+
+        with self.assertRaises(NotImplementedError):
+            test4[i] = 4
+
+        with self.assertRaises(NotImplementedError):
+            test4._set([1, 2, 3])
+
+        with self.assertRaises(NotImplementedError):
+            test4.set([1, 2, 3])
 
         d.kill()
         d.terminate()

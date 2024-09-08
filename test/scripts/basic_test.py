@@ -42,10 +42,17 @@ class BasicTest(unittest.TestCase):
         self.assertEqual(provola3.get(), twos_complement(0xdeadbeefdeadbeef, 64))
         self.assertEqual(provola4.get(), (0xdeadbeefdeadbeef * 2) & ((1 << 64) - 1))
 
+        self.assertEqual(int(provola1), provola1.value)
+
         provola1._set(0x1)
         provola2._set(0x2)
         provola3.value = 0x3
         provola4._set(0x4)
+
+        self.assertEqual(bytes(provola1), b"\x01\x00\x00\x00")
+        self.assertEqual(bytes(provola2), b"\x02\x00\x00\x00")
+        self.assertEqual(bytes(provola3), b"\x03\x00\x00\x00\x00\x00\x00\x00")
+        self.assertEqual(bytes(provola4), b"\x04\x00\x00\x00\x00\x00\x00\x00")
 
         d.cont()
 
@@ -93,6 +100,11 @@ class BasicTest(unittest.TestCase):
         self.assertEqual(provola2.value, 2)
         self.assertEqual(provola3.value, 3)
         self.assertEqual(provola4.value, 4)
+
+        self.assertEqual(bytes(provola1), b"\x01\x00\x00\x00")
+        self.assertEqual(bytes(provola2), b"\x02\x00\x00\x00")
+        self.assertEqual(bytes(provola3), b"\x03\x00\x00\x00\x00\x00\x00\x00")
+        self.assertEqual(bytes(provola4), b"\x04\x00\x00\x00\x00\x00\x00\x00")
 
         self.assertRaises(ValueError, provola1.set, 0x1)
 

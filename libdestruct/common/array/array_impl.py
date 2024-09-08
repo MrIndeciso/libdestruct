@@ -34,16 +34,16 @@ class array_impl(array):
         super().__init__(resolver)
 
         self.backing_type = backing_type
-        self.count = count
-        self.size = self.backing_type.size * self.count
+        self._count = count
+        self.size = self.backing_type.size * self._count
 
-    def size(self: array_impl) -> int:
+    def count(self: array_impl) -> int:
         """Get the size of the array."""
-        return self.size
+        return self._count
 
-    def get(self: array_impl) -> str:
-        """Get the array as a string."""
-        return f"[{', '.join(str(i) for i in self)}]"
+    def get(self: array, index: int) -> object:
+        """Return the element at the given index."""
+        return self.backing_type(self.resolver.relative_from_own(index * self.backing_type.size, 0))
 
     def _set(self: array_impl, _: list[obj]) -> None:
         """Set the array from a list."""
@@ -55,11 +55,7 @@ class array_impl(array):
 
     def to_bytes(self: array_impl) -> bytes:
         """Return the serialized representation of the array."""
-        return b"".join(x for x in self)
-
-    def __getitem__(self: array_impl, index: int) -> obj:
-        """Get an item from the array."""
-        return self.backing_type(self.resolver.relative_from_own(index * self.backing_type.size, 0))
+        return b"".join(bytes(x) for x in self)
 
     def __setitem__(self: array_impl, index: int, value: obj) -> None:
         """Set an item in the array."""
@@ -67,5 +63,5 @@ class array_impl(array):
 
     def __iter__(self: array_impl) -> Generator[obj, None, None]:
         """Iterate over the array."""
-        for i in range(self.count):
+        for i in range(self._count):
             yield self[i]

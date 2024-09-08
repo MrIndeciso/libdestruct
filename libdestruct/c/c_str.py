@@ -12,7 +12,7 @@ from libdestruct.common.array.array import array
 class c_str(array):
     """A C string."""
 
-    def size(self: c_str) -> int:
+    def count(self: c_str) -> int:
         """Return the size of the string."""
         size = 0
 
@@ -26,21 +26,21 @@ class c_str(array):
 
     def get(self: c_str, index: int = -1) -> bytes:
         """Return the character at the given index."""
-        if index != -1 and index < 0 or index >= self.size():
+        if index != -1 and index < 0 or index >= self.count():
             raise IndexError("String index out of range.")
 
         if index == -1:
-            return self.resolver.resolve(self.size(), 0)
+            return self.resolver.resolve(self.count(), 0)
 
         return bytes([self.resolver.resolve(index)[-1]])
 
     def to_bytes(self: c_str) -> bytes:
         """Return the serialized representation of the object."""
-        return self.resolver.resolve(self.size(), 0)
+        return self.resolver.resolve(self.count(), 0)
 
     def _set(self: c_str, value: bytes, index: int = -1) -> None:
         """Set the character at the given index to the given value."""
-        if index != -1 and index < 0 or index >= self.size():
+        if index != -1 and index < 0 or index >= self.count():
             raise IndexError("String index out of range.")
 
         if index == -1:
@@ -52,5 +52,5 @@ class c_str(array):
 
     def __iter__(self: c_str) -> iter:
         """Return an iterator over the string."""
-        for i in range(self.size()):
+        for i in range(self.count()):
             yield self.get(i)

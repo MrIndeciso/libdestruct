@@ -15,12 +15,12 @@ class array(obj):
     """An array of objects."""
 
     @abstractmethod
-    def size(self: array) -> int:
+    def count(self: array) -> int:
         """Return the size of the array."""
 
     def __len__(self: array) -> int:
         """Return the size of the array."""
-        return self.size()
+        return self.count()
 
     @abstractmethod
     def get(self: array, index: int) -> object:
