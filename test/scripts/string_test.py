@@ -24,7 +24,7 @@ class StringTest(unittest.TestCase):
 
         d.cont()
 
-        assert bp1.hit_on(d)
+        self.assertTrue(bp1.hit_on(d))
 
         libdestruct = inflater(d.memory)
 
@@ -36,7 +36,7 @@ class StringTest(unittest.TestCase):
 
         d.cont()
 
-        assert bp2.hit_on(d)
+        self.assertTrue(bp2.hit_on(d))
 
         self.assertEqual(string.value, b"Hello,")
 
@@ -46,6 +46,6 @@ class StringTest(unittest.TestCase):
 
         d.kill()
 
-        assert check.hit_count == 0
+        self.assertEqual(check.hit_count, 0)
 
         d.terminate()

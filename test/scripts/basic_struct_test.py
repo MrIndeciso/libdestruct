@@ -22,7 +22,7 @@ class BasicStructTest(unittest.TestCase):
         check = d.bp("check", callback=empty_callback)
         d.cont()
 
-        assert bp1.hit_on(d)
+        self.assertTrue(bp1.hit_on(d))
 
         libdestruct = inflater(d.memory)
 
@@ -48,7 +48,7 @@ class BasicStructTest(unittest.TestCase):
 
         d.cont()
 
-        assert bp2.hit_on(d)
+        self.assertTrue(bp2.hit_on(d))
 
         self.assertEqual(test.a.value, 0xeadbeef)
         self.assertEqual(test.b.value, 0xdeadbeef)
@@ -70,7 +70,7 @@ class BasicStructTest(unittest.TestCase):
 
         d.cont()
 
-        assert bp.hit_on(d)
+        self.assertTrue(bp.hit_on(d))
 
         class test2(struct):
             b: c_long
@@ -105,7 +105,7 @@ class BasicStructTest(unittest.TestCase):
 
         d.cont()
 
-        assert bp1.hit_on(d)
+        self.assertTrue(bp1.hit_on(d))
 
         check.enable()
 
@@ -133,7 +133,7 @@ class BasicStructTest(unittest.TestCase):
 
         d.cont()
 
-        assert bp2.hit_on(d)
+        self.assertTrue(bp2.hit_on(d))
 
         self.assertEqual(check.hit_count, 0)
 
@@ -149,7 +149,7 @@ class BasicStructTest(unittest.TestCase):
 
         d.cont()
 
-        assert bp.hit_on(d)
+        self.assertTrue(bp.hit_on(d))
 
         libdestruct = inflater(d.memory)
 
@@ -196,7 +196,7 @@ class BasicStructTest(unittest.TestCase):
 
         d.cont()
 
-        assert bp1.hit_on(d)
+        self.assertTrue(bp1.hit_on(d))
 
         check.enable()
 
@@ -250,7 +250,7 @@ class BasicStructTest(unittest.TestCase):
 
         d.cont()
 
-        assert bp2.hit_on(d)
+        self.assertTrue(bp2.hit_on(d))
 
         self.assertEqual(check.hit_count, 0)
 
@@ -258,7 +258,7 @@ class BasicStructTest(unittest.TestCase):
 
         d.cont()
 
-        assert bp3.hit_on(d)
+        self.assertTrue(bp3.hit_on(d))
 
         self.assertEqual(test.a.value, 0x1234)
         self.assertEqual(check.hit_count, 0)
@@ -282,9 +282,9 @@ class BasicStructTest(unittest.TestCase):
 
         test = test_t.from_bytes(memory)
 
-        assert test.a.value == 1337
-        assert test.b.value == 13371337
-        assert test.c.unwrap().a.value == 1234
-        assert test.c.unwrap().b.value == 12345678
-        assert test.address == 0x0
-        assert test.c.unwrap().address == (4 + 8 + 8)
+        self.assertEqual(test.a.value, 1337)
+        self.assertEqual(test.b.value, 13371337)
+        self.assertEqual(test.c.unwrap().a.value, 1234)
+        self.assertEqual(test.c.unwrap().b.value, 12345678)
+        self.assertEqual(test.address, 0x0)
+        self.assertEqual(test.c.unwrap().address, (4 + 8 + 8))

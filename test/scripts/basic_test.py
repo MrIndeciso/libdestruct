@@ -25,7 +25,7 @@ class BasicTest(unittest.TestCase):
 
         d.cont()
 
-        assert bp1.hit_on(d)
+        self.assertTrue(bp1.hit_on(d))
 
         def twos_complement(value, bits):
             if value & (1 << bits - 1):
@@ -56,7 +56,7 @@ class BasicTest(unittest.TestCase):
 
         d.cont()
 
-        assert bp2.hit_on(d)
+        self.assertTrue(bp2.hit_on(d))
 
         d.kill()
 
@@ -75,7 +75,7 @@ class BasicTest(unittest.TestCase):
 
         d.cont()
 
-        assert bp1.hit_on(d)
+        self.assertTrue(bp1.hit_on(d))
 
         provola1 = libdestruct.inflate(c_int, 0xdeadb000)
         provola2 = libdestruct.inflate(c_uint, 0xdeadb000 + 0x100)
@@ -94,7 +94,7 @@ class BasicTest(unittest.TestCase):
 
         d.cont()
 
-        assert bp2.hit_on(d)
+        self.assertTrue(bp2.hit_on(d))
 
         self.assertEqual(provola1.value, 1)
         self.assertEqual(provola2.value, 2)
@@ -125,7 +125,7 @@ class BasicTest(unittest.TestCase):
 
         d.cont()
 
-        assert bp1.hit_on(d)
+        self.assertTrue(bp1.hit_on(d))
 
         provola1 = libdestruct.inflate(c_int, 0xdeadb000)
         provola2 = libdestruct.inflate(c_uint, 0xdeadb000 + 0x100)
