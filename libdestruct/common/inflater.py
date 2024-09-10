@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING
 from libdestruct.backing.memory_resolver import MemoryResolver
 from libdestruct.common.type_registry import TypeRegistry
 
-if TYPE_CHECKING:
+if TYPE_CHECKING: # pragma: no cover
     from collections.abc import MutableSequence
 
     from libdestruct.backing.resolver import Resolver

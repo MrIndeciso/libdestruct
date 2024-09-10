@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING
 
 from libdestruct.common.inflater import Inflater
 
-if TYPE_CHECKING:
+if TYPE_CHECKING: # pragma: no cover
     from collections.abc import MutableSequence
 
 

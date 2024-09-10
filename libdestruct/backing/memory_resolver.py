@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING
 
 from libdestruct.backing.resolver import Resolver
 
-if TYPE_CHECKING:
+if TYPE_CHECKING: # pragma: no cover
     from collections.abc import MutableSequence
 
 

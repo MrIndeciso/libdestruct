@@ -12,7 +12,7 @@ from libdestruct.common.field import Field
 from libdestruct.common.ptr import ptr
 from libdestruct.common.struct.struct_field import StructField
 
-if TYPE_CHECKING:
+if TYPE_CHECKING: # pragma: no cover
     from libdestruct.backing.resolver import Resolver
     from libdestruct.common.obj import obj
 

@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING
 
 from libdestruct.common.struct.ptr_struct_field import PtrStructField
 
-if TYPE_CHECKING:
+if TYPE_CHECKING: # pragma: no cover
     from libdestruct.common.field import Field
     from libdestruct.common.obj import obj
 

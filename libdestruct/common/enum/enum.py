@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING
 from libdestruct.common.obj import obj
 from libdestruct.common.type_registry import TypeRegistry
 
-if TYPE_CHECKING:
+if TYPE_CHECKING: # pragma: no cover
     from enum import Enum
 
     from libdestruct.backing.resolver import Resolver

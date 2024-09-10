@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING
 from libdestruct.common.obj import obj
 from libdestruct.libdestruct import inflater
 
-if TYPE_CHECKING:
+if TYPE_CHECKING: # pragma: no cover
     from libdestruct.common.struct.struct_impl import struct_impl
 
 

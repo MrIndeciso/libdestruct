@@ -12,7 +12,7 @@ from typing import TYPE_CHECKING
 from libdestruct.common.array.linear_array_field import LinearArrayField
 from libdestruct.common.type_registry import TypeRegistry
 
-if TYPE_CHECKING:
+if TYPE_CHECKING: # pragma: no cover
     from collections.abc import Callable
 
     from libdestruct.backing.resolver import Resolver

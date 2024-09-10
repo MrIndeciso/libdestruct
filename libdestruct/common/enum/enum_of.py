@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING
 
 from libdestruct.common.enum.int_enum_field import IntEnumField
 
-if TYPE_CHECKING:
+if TYPE_CHECKING: # pragma: no cover
     from libdestruct.common.enum.enum_field import EnumField
 
 

@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING
 from libdestruct.common.array.array_field import ArrayField
 from libdestruct.common.array.array_impl import array_impl
 
-if TYPE_CHECKING:
+if TYPE_CHECKING: # pragma: no cover
     from libdestruct.backing.resolver import Resolver
     from libdestruct.common.array.array import array
     from libdestruct.common.obj import obj

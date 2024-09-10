@@ -288,3 +288,48 @@ class BasicStructTest(unittest.TestCase):
         self.assertEqual(test.c.unwrap().b.value, 12345678)
         self.assertEqual(test.address, 0x0)
         self.assertEqual(test.c.unwrap().address, (4 + 8 + 8))
+
+        self.assertEqual(test.size, 4 + 8 + 8)
+
+    def test_struct_equality(self):
+        class test_t(struct):
+            a: c_int
+            b: c_long
+            c: ptr = ptr_to_self()
+
+        memory = b""
+        memory += (1337).to_bytes(4, "little")
+        memory += (13371337).to_bytes(8, "little")
+        memory += (4 + 8 + 8).to_bytes(8, "little")
+        memory += (1234).to_bytes(4, "little")
+        memory += (12345678).to_bytes(8, "little")
+        memory += (0).to_bytes(8, "little")
+
+        test1 = test_t.from_bytes(memory)
+        test2 = test_t.from_bytes(memory)
+
+        self.assertEqual(test1, test2)
+
+        test2 = test1.c.unwrap()
+
+        self.assertNotEqual(test1, test2)
+        self.assertNotEqual(test1, 0xdeadbeef)
+
+        class test_t2(struct):
+            a: c_int
+            b: c_long
+            c: c_int
+            d: ptr = ptr_to_self()
+
+        test2 = test_t2.from_bytes(memory)
+
+        self.assertNotEqual(test1, test2)
+
+        class test_t3(struct):
+            x: c_int
+            y: c_long
+            z: ptr = ptr_to_self()
+
+        test2 = test_t3.from_bytes(memory)
+
+        self.assertNotEqual(test1, test2)

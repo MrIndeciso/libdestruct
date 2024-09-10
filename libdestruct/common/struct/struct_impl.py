@@ -12,7 +12,7 @@ from libdestruct.common.obj import obj
 from libdestruct.common.struct import struct
 from libdestruct.common.type_registry import TypeRegistry
 
-if TYPE_CHECKING:
+if TYPE_CHECKING: # pragma: no cover
     from libdestruct.backing.resolver import Resolver
 
 
@@ -37,7 +37,6 @@ class struct_impl(struct):
         obj.__init__(self, resolver)
 
         self.name = self.__class__.__name__
-        self.size = 0
         self._members = {}
 
         reference_type = self._reference_struct
