@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING
 
 from libdestruct.common.field import Field
 
-if TYPE_CHECKING: # pragma: no cover
+if TYPE_CHECKING:  # pragma: no cover
     from collections.abc import Callable
 
     from typing_extensions import Self
@@ -25,7 +25,7 @@ class TypeRegistry:
     mapping: dict[type[obj], type[obj]]
     """The mapping of object types to their implementations."""
 
-    type_handlers: dict[type[obj], list[Callable[[type[obj]], type[obj] | None]]]
+    type_handlers: dict[type, list[Callable[[type[obj]], type[obj] | None]]]
     """The handlers for generic object types, with basic inheritance support."""
 
     instance_handlers: dict[
