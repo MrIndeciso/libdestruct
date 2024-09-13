@@ -6,6 +6,11 @@
 
 import unittest
 
+try:
+    from ctypes import c_time_t
+except ImportError:
+    from ctypes import c_long as c_time_t
+
 from ctypes import *
 from libdebug import debugger
 from libdestruct import inflater, struct
