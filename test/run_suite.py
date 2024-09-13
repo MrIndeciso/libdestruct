@@ -11,6 +11,7 @@ from unittest import TestSuite, TextTestRunner, TestLoader
 from scripts.array_test import ArrayTest
 from scripts.basic_test import BasicTest
 from scripts.basic_struct_test import BasicStructTest
+from scripts.ctypes_test import CtypesTest
 from scripts.string_test import StringTest
 
 def test_suite():
@@ -19,6 +20,7 @@ def test_suite():
     suite.addTest(TestLoader().loadTestsFromTestCase(ArrayTest))
     suite.addTest(TestLoader().loadTestsFromTestCase(BasicTest))
     suite.addTest(TestLoader().loadTestsFromTestCase(BasicStructTest))
+    suite.addTest(TestLoader().loadTestsFromTestCase(CtypesTest))
     suite.addTest(TestLoader().loadTestsFromTestCase(StringTest))
 
     return suite
