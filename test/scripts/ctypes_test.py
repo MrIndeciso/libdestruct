@@ -17,6 +17,7 @@ class CtypesTest(unittest.TestCase):
         d.run()
 
         bp = d.breakpoint("leak")
+        check = d.breakpoint("correct")
 
         class provola(struct):
             a: c_bool
@@ -77,6 +78,35 @@ class CtypesTest(unittest.TestCase):
         self.assertEqual(obj.x.value, 0x46)
         self.assertEqual(obj.y.value, 0xbeefbeefbeef)
         self.assertEqual(obj.z.value, 0xd00dd00dd00dd00d)
+
+        obj.a.value = False
+        obj.b.value = 1234
+        obj.c.value = b'\x23'
+        obj.e.value = 1234.5678
+        obj.f.value = 234.567
+        obj.g.value = 23456
+        obj.h.value = 32767
+        obj.i.value = 0xadbeef
+        obj.j.value = 0xadbeefdeadbeef
+        obj.k.value = 98
+        obj.l.value = 0xadbeefd00dbeef
+        obj.m.value = 345.678
+        obj.n.value = 0xedbeefdeadbeef
+        obj.o.value = 8765
+        obj.p.value = 0xeadbeefdeadbeef
+        obj.r.value = 0x234567
+        obj.s.value = 0x2345
+        obj.t.value = 0xeadbeef
+        obj.u.value = 0x2345
+        obj.v.value = 0xbadbeef
+        obj.w.value = 0xbadbeefbadbeef
+        obj.x.value = 0x28
+        obj.y.value = 0xbadbadbadbad
+        obj.z.value = 0xbadd00dbadd00d
+
+        d.cont()
+
+        self.assertTrue(check.hit_on(d))
 
         d.kill()
         d.terminate()
