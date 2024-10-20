@@ -104,7 +104,7 @@ class struct_impl(struct):
         """Return a string representation of the struct."""
         members = ",\n".join(
             [
-                f"{' ' * (indent + 4)}{name}: {member.to_str(indent + 4) if isinstance(member, struct) else member.to_str(0)}"
+                f"{' ' * (indent + 4)}{name}: {member.to_str(indent + 4)}"
                 for name, member in self._members.items()
             ],
         )

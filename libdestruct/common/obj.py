@@ -110,7 +110,7 @@ class obj(ABC):
 
     def to_str(self: obj, indent: int = 0) -> str:
         """Return a string representation of the object."""
-        return f"{' ' * indent}{self.get()}"
+        return f"{self.get()}"
 
     def pdiff(self: obj) -> str:
         """Return a string representation of the difference between the current value and the frozen value."""

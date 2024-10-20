@@ -8,8 +8,11 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from libdestruct.c.c_integer_types import _c_integer
+from libdestruct.c.ctypes_generic import _ctypes_generic
 from libdestruct.common.array.array import array
 from libdestruct.common.obj import obj
+from libdestruct.common.struct.struct import struct
 
 if TYPE_CHECKING: # pragma: no cover
     from collections.abc import Generator
@@ -59,7 +62,16 @@ class array_impl(array):
 
     def to_str(self: array_impl, indent: int = 0) -> str:
         """Return the string representation of the array."""
-        return "[" + ", ".join(x.to_str(indent) for x in self) + "]"
+        if self._count == 0:
+            return "[]"
+
+        # If the backing type is a struct, we need to indent the output differently
+        if issubclass(self.backing_type, struct):
+            padding = ",\n" + " " * (indent + 4)
+            spacing = " " * (indent + 4)
+            return "[\n" + spacing + padding.join(x.to_str(indent + 4) for x in self) + "\n" + " " * (indent) + "]"
+
+        return "[" + ", ".join(x.to_str(indent + 4) for x in self) + "]"
 
     def __setitem__(self: array_impl, index: int, value: obj) -> None:
         """Set an item in the array."""
