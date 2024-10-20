@@ -112,10 +112,6 @@ class struct_impl(struct):
 {members}
 {' ' * indent}}}"""
 
-    def __str__(self: struct_impl) -> str:
-        """Return a string representation of the struct."""
-        return self.to_str()
-
     def __repr__(self: struct_impl) -> str:
         """Return a string representation of the struct."""
         members = ",\n".join([f"{name}: {member}" for name, member in self._members.items()])
