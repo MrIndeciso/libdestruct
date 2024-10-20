@@ -57,6 +57,10 @@ class array_impl(array):
         """Return the serialized representation of the array."""
         return b"".join(bytes(x) for x in self)
 
+    def to_str(self: array_impl, indent: int = 0) -> str:
+        """Return the string representation of the array."""
+        return "[" + ", ".join(x.to_str(indent) for x in self) + "]"
+
     def __setitem__(self: array_impl, index: int, value: obj) -> None:
         """Set an item in the array."""
         raise NotImplementedError("Cannot set items in an array.")
