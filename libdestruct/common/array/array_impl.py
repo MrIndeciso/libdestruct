@@ -8,8 +8,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from libdestruct.c.c_integer_types import _c_integer
-from libdestruct.c.ctypes_generic import _ctypes_generic
 from libdestruct.common.array.array import array
 from libdestruct.common.obj import obj
 from libdestruct.common.struct.struct import struct
