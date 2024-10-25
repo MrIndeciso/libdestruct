@@ -30,6 +30,8 @@ def definition_to_type(definition: str) -> type[obj]:
         force_more_tops = True
     elif "typedef" in definition:
         force_more_tops = True
+    else:
+        force_more_tops = False
 
     try:
         ast = parser.parse(definition)
