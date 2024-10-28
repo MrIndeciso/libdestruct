@@ -9,7 +9,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
-if TYPE_CHECKING: # pragma: no cover
+if TYPE_CHECKING:  # pragma: no cover
     from libdestruct.backing.resolver import Resolver
     from libdestruct.common.obj import obj
 
@@ -26,3 +26,7 @@ class Field(ABC):
         Args:
             resolver: The backing resolver for the object.
         """
+
+    @abstractmethod
+    def get_size(self: Field) -> int:
+        """Returns the size of the object inflated by this field."""

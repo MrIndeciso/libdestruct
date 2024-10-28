@@ -8,16 +8,15 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from libdestruct.c.ctypes_generic import _ctypes_generic
 from libdestruct.common.array.array import array
-from libdestruct.common.field import Field
-from libdestruct.common.obj import obj
 from libdestruct.common.struct.struct import struct
+from libdestruct.common.utils import size_of
 
 if TYPE_CHECKING: # pragma: no cover
     from collections.abc import Generator
 
     from libdestruct.backing.resolver import Resolver
+    from libdestruct.common.obj import obj
 
 
 class array_impl(array):
@@ -25,6 +24,9 @@ class array_impl(array):
 
     size: int
     """The size of the array."""
+
+    item_size: int
+    """The size of each item in the array."""
 
     def __init__(
         self: array_impl,
@@ -37,15 +39,8 @@ class array_impl(array):
 
         self.backing_type = backing_type
         self._count = count
-
-        if hasattr(backing_type, "size"):
-            self.size = self.backing_type.size * self._count
-            self.item_size = self.backing_type.size
-        elif callable(backing_type):
-            self.size = 8 * self._count
-            self.item_size = 8
-        else:
-            raise NotImplementedError("Unsupported backing type.")
+        self.item_size = size_of(self.backing_type)
+        self.size = self.item_size * self._count
 
     def count(self: array_impl) -> int:
         """Get the size of the array."""

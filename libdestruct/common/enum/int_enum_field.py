@@ -54,3 +54,7 @@ class IntEnumField(EnumField):
             resolver: The backing resolver for the object.
         """
         return enum(resolver, self.enum, self.backing_type, self.lenient)
+
+    def get_size(self: IntEnumField) -> int:
+        """Returns the size of the object inflated by this field."""
+        return self.backing_type.size

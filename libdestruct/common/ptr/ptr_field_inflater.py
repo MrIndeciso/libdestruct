@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from libdestruct.common.ptr.ptr_struct_field import PtrStructField
+from libdestruct.common.ptr.ptr_field import PtrField
 from libdestruct.common.type_registry import TypeRegistry
 
 if TYPE_CHECKING: # pragma: no cover
@@ -21,7 +21,7 @@ registry = TypeRegistry()
 
 
 def ptr_field_inflater(
-    field: PtrStructField,
+    field: PtrField,
     _: type[obj],
     owner: tuple[obj, type[obj]] | None,
 ) -> Callable[[Resolver], obj]:
@@ -37,4 +37,4 @@ def ptr_field_inflater(
     return field.inflate
 
 
-registry.register_instance_handler(PtrStructField, ptr_field_inflater)
+registry.register_instance_handler(PtrField, ptr_field_inflater)
