@@ -22,6 +22,12 @@ if TYPE_CHECKING:
     from libdestruct.common.obj import obj
 
 
+PARSED_STRUCT = {}
+"""A cache for parsed struct definitions, indexed by name."""
+
+TYPEDEFS = {}
+"""A cache for parsed type definitions, indexed by name."""
+
 def definition_to_type(definition: str) -> type[obj]:
     """Converts a C struct definition to a struct object."""
     parser = c_parser.CParser()
@@ -29,26 +35,30 @@ def definition_to_type(definition: str) -> type[obj]:
     # If the definition contains includes, we must expand them.
     if "#include" in definition:
         definition = cleanup_attributes(expand_includes(definition))
-        force_more_tops = True
-    elif "typedef" in definition:
-        force_more_tops = True
-    else:
-        force_more_tops = False
 
     try:
         ast = parser.parse(definition)
     except c_parser.ParseError as e:
         raise ValueError("Invalid definition. Please add the necessary includes if using non-standard type definitions.") from e
 
-    if not force_more_tops and len(ast.ext) != 1:
-        raise ValueError("Definition must contain exactly one top object.")
-
-    # If force_more_tops is True, we take the last top object.
-    # This is useful when a struct definition is preceded by typedefs.
-    root = ast.ext[-1].type if force_more_tops else ast.ext[0].type
+    # We assume that the root declaration is the last one.
+    root = ast.ext[-1].type
 
     if not isinstance(root, c_ast.Struct):
         raise TypeError("Definition must be a struct.")
+
+    # We parse each declaration in the definition, except the last one, if it is a struct.
+    for decl in ast.ext[:-1]:
+        if isinstance(decl.type, c_ast.Struct):
+            struct_node = decl.type
+
+            if struct_node.name:
+                PARSED_STRUCT[struct_node.name] = struct_to_type(struct_node)
+        elif isinstance(decl, c_ast.Typedef):
+            name, definition = typedef_to_pair(decl)
+            TYPEDEFS[name] = definition
+
+    print(TYPEDEFS)
 
     return struct_to_type(root)
 
@@ -59,6 +69,12 @@ def struct_to_type(struct_node: c_ast.Struct) -> type[struct]:
         raise TypeError("Definition must be a struct.")
 
     fields = {}
+
+    if not struct_node.decls and struct_node.name in PARSED_STRUCT:
+        # We can check if the struct is already parsed.
+        return PARSED_STRUCT[struct_node.name]
+    elif not struct_node.decls:
+        raise ValueError("Struct must have fields.")
 
     for decl in struct_node.decls:
         name = decl.name
@@ -122,6 +138,20 @@ def type_decl_to_type(decl: c_ast.TypeDecl, parent: c_ast.Struct | None = None) 
     raise TypeError("Unsupported type.")
 
 
+def typedef_to_pair(typedef: c_ast.Typedef) -> tuple[str, type[obj]]:
+    """Converts a C typedef to a pair of name and definition."""
+    if not isinstance(typedef, c_ast.Typedef):
+        raise TypeError("Definition must be a typedef.")
+
+    if not isinstance(typedef.type, c_ast.TypeDecl):
+        raise TypeError("Definition must be a type declaration.")
+
+    name = "".join(typedef.name)
+    definition = type_decl_to_type(typedef.type)
+
+    return name, definition
+
+
 def to_uniform_name(name: str) -> str:
     """Converts a name to a uniform name."""
     name = name.replace("unsigned", "u")
@@ -181,5 +211,9 @@ def identifier_to_type(identifier: c_ast.IdentifierType) -> type[obj]:
 
     if hasattr(ctypes, ctypes_name):
         return getattr(ctypes, ctypes_name)
+
+    # Check if we have a typedef to resolve this
+    if identifier_name in TYPEDEFS:
+        return TYPEDEFS[identifier_name]
 
     raise ValueError(f"Unsupported identifier: {identifier_name}.")
