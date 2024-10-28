@@ -4,7 +4,7 @@
 # Licensed under the MIT license. See LICENSE file in the project root for details.
 #
 
-from libdestruct.common.struct.ptr_factory import ptr_to, ptr_to_self
+from libdestruct.common.ptr.ptr_factory import ptr_to, ptr_to_self
 from libdestruct.common.struct.struct import struct
 from libdestruct.common.struct.struct_impl import struct_impl
 

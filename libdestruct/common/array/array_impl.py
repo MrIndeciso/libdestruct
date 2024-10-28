@@ -8,7 +8,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from libdestruct.c.ctypes_generic import _ctypes_generic
 from libdestruct.common.array.array import array
+from libdestruct.common.field import Field
 from libdestruct.common.obj import obj
 from libdestruct.common.struct.struct import struct
 
@@ -16,7 +18,6 @@ if TYPE_CHECKING: # pragma: no cover
     from collections.abc import Generator
 
     from libdestruct.backing.resolver import Resolver
-    from libdestruct.common.obj import obj
 
 
 class array_impl(array):
@@ -36,7 +37,15 @@ class array_impl(array):
 
         self.backing_type = backing_type
         self._count = count
-        self.size = self.backing_type.size * self._count
+
+        if hasattr(backing_type, "size"):
+            self.size = self.backing_type.size * self._count
+            self.item_size = self.backing_type.size
+        elif callable(backing_type):
+            self.size = 8 * self._count
+            self.item_size = 8
+        else:
+            raise NotImplementedError("Unsupported backing type.")
 
     def count(self: array_impl) -> int:
         """Get the size of the array."""
@@ -44,7 +53,7 @@ class array_impl(array):
 
     def get(self: array, index: int) -> object:
         """Return the element at the given index."""
-        return self.backing_type(self.resolver.relative_from_own(index * self.backing_type.size, 0))
+        return self.backing_type(self.resolver.relative_from_own(index * self.item_size, 0))
 
     def _set(self: array_impl, _: list[obj]) -> None:
         """Set the array from a list."""
@@ -64,7 +73,7 @@ class array_impl(array):
             return "[]"
 
         # If the backing type is a struct, we need to indent the output differently
-        if issubclass(self.backing_type, struct):
+        if isinstance(self.backing_type, type) and issubclass(self.backing_type, struct):
             padding = ",\n" + " " * (indent + 4)
             spacing = " " * (indent + 4)
             return "[\n" + spacing + padding.join(x.to_str(indent + 4) for x in self) + "\n" + " " * (indent) + "]"

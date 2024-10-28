@@ -17,6 +17,8 @@ if TYPE_CHECKING: # pragma: no cover
 class Field(ABC):
     """A generator for a generic field."""
 
+    base_type: type[obj]
+
     @abstractmethod
     def inflate(self: Field, resolver: Resolver) -> obj:
         """Inflate the field.

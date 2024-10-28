@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from libdestruct.common.struct.ptr_struct_field import PtrStructField
+from libdestruct.common.ptr.ptr_struct_field import PtrStructField
 from libdestruct.common.type_registry import TypeRegistry
 
 if TYPE_CHECKING: # pragma: no cover

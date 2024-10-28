@@ -14,6 +14,8 @@ from typing import TYPE_CHECKING
 
 from pycparser import c_ast, c_parser
 
+from libdestruct.common.array.array_of import array_of
+from libdestruct.common.ptr.ptr_factory import ptr_to, ptr_to_self
 from libdestruct.common.struct import struct
 
 if TYPE_CHECKING:
@@ -60,7 +62,7 @@ def struct_to_type(struct_node: c_ast.Struct) -> type[struct]:
 
     for decl in struct_node.decls:
         name = decl.name
-        typ = type_decl_to_type(decl.type)
+        typ = type_decl_to_type(decl.type, struct_node)
         fields[name] = typ
 
     type_name = struct_node.name if struct_node.name else "anon_struct"
@@ -68,10 +70,48 @@ def struct_to_type(struct_node: c_ast.Struct) -> type[struct]:
     return type(type_name, (struct,), {"__annotations__": fields})
 
 
-def type_decl_to_type(decl: c_ast.TypeDecl) -> type[obj]:
-    """Converts a C type declaration to a type."""
-    if not isinstance(decl, c_ast.TypeDecl):
+def ptr_to_type(ptr: c_ast.PtrDecl, parent: c_ast.Struct | None = None) -> type[obj]:
+    """Converts a C pointer to a type."""
+    if not isinstance(ptr, c_ast.PtrDecl):
+        raise TypeError("Definition must be a pointer.")
+
+    if not isinstance(ptr.type, c_ast.TypeDecl):
         raise TypeError("Definition must be a type declaration.")
+
+    # Special case: this is a pointer to self
+    # Note that ptr can either be a struct or an identifier.
+    ptr_name = ptr.type.type.name if isinstance(ptr.type.type, c_ast.Struct) else ptr.type.type.names[0]
+    if parent and ptr_name == parent.name:
+        return ptr_to_self()
+
+    typ = type_decl_to_type(ptr.type)
+
+    return ptr_to(typ)
+
+
+def arr_to_type(arr: c_ast.ArrayDecl) -> type[obj]:
+    """Converts a C array to a type."""
+    if not isinstance(arr, c_ast.ArrayDecl):
+        raise TypeError("Definition must be an array.")
+
+    if not isinstance(arr.type, c_ast.TypeDecl) and not isinstance(arr.type, c_ast.PtrDecl):
+        raise TypeError("Definition must be a type declaration.")
+
+    typ = ptr_to_type(arr.type) if isinstance(arr.type, c_ast.PtrDecl) else type_decl_to_type(arr.type)
+
+    return array_of(typ, int(arr.dim.value))
+
+
+def type_decl_to_type(decl: c_ast.TypeDecl, parent: c_ast.Struct | None = None) -> type[obj]:
+    """Converts a C type declaration to a type."""
+    if not isinstance(decl, c_ast.TypeDecl) and not isinstance(decl, c_ast.PtrDecl) and not isinstance(decl, c_ast.ArrayDecl):
+        raise TypeError("Definition must be a type declaration.")
+
+    if isinstance(decl, c_ast.PtrDecl):
+        return ptr_to_type(decl, parent)
+
+    if isinstance(decl, c_ast.ArrayDecl):
+        return arr_to_type(decl)
 
     if isinstance(decl.type, c_ast.Struct):
         return struct_to_type(decl.type)
@@ -94,6 +134,9 @@ def to_uniform_name(name: str) -> str:
     name = name.replace("int16_t", "short")
     name = name.replace("int32_t", "int")
     name = name.replace("int64_t", "longlong")
+
+    # We have to convert uintptr_t
+    name = name.replace("uintptr_t", "ulonglong")
 
     # Only size_t, ssize_t and time_t can end with _t
     if not any(x in name for x in ["size", "ssize", "time"]):

@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from libdestruct.common.field import Field
 from libdestruct.common.obj import obj
 from libdestruct.common.struct import struct
 from libdestruct.common.type_registry import TypeRegistry
@@ -73,6 +74,9 @@ class struct_impl(struct):
                 # Field associated with the annotation
                 field = getattr(reference_type, name)
                 attribute = cls._inflater.inflater_for((field, annotation))(None)
+                size += attribute.size
+            elif isinstance(annotation, Field):
+                attribute = cls._inflater.inflater_for((annotation, annotation.base_type))(None)
                 size += attribute.size
             else:
                 attribute = cls._inflater.inflater_for(annotation)

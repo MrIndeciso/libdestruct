@@ -9,7 +9,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from libdestruct.common.field import Field
-from libdestruct.common.ptr import ptr
+from libdestruct.common.ptr.ptr import ptr
 from libdestruct.common.struct.struct_field import StructField
 
 if TYPE_CHECKING: # pragma: no cover
@@ -19,6 +19,8 @@ if TYPE_CHECKING: # pragma: no cover
 
 class PtrStructField(StructField):
     """A generator for a field of a struct."""
+
+    base_type: type[obj] = ptr
 
     def __init__(self: PtrStructField, backing_type: type | Field) -> None:
         """Initialize a pointer field.
