@@ -57,7 +57,7 @@ class struct_impl(struct):
                 field = getattr(reference_type, name)
                 resolved_type = inflater.inflater_for((field, annotation), owner=(self, reference_type._type_impl))
             else:
-                resolved_type = inflater.inflater_for(annotation)
+                resolved_type = inflater.inflater_for(annotation, owner=(self, reference_type._type_impl))
 
             result = resolved_type(resolver.relative_from_own(current_offset, 0))
             setattr(self, name, result)

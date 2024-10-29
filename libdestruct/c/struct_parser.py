@@ -58,8 +58,6 @@ def definition_to_type(definition: str) -> type[obj]:
             name, definition = typedef_to_pair(decl)
             TYPEDEFS[name] = definition
 
-    print(TYPEDEFS)
-
     return struct_to_type(root)
 
 
