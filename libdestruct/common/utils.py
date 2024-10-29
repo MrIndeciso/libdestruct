@@ -7,11 +7,13 @@
 from __future__ import annotations
 
 from types import MethodType
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from libdestruct.common.field import Field
 
 if TYPE_CHECKING:  # pragma: no cover
+    from collections.abc import Generator
+
     from libdestruct.backing.resolver import Resolver
     from libdestruct.common.obj import obj
 
@@ -32,3 +34,11 @@ def size_of(item_or_inflater: obj | callable[[Resolver], obj]) -> int:
         return field_object.get_size()
 
     raise ValueError(f"Cannot determine the size of {item_or_inflater}")
+
+
+def iterate_annotation_chain(item: obj, terminate_at: object | None = None) -> Generator[tuple[str, Any]]:
+    """Iterate over the annotation chain of the provided item."""
+    current_item = item
+    while current_item is not terminate_at:
+        yield from current_item.__annotations__.items()
+        current_item = current_item.__base__ if hasattr(current_item, "__base__") else None

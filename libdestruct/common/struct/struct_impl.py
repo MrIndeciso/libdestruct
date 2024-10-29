@@ -13,6 +13,7 @@ from libdestruct.common.field import Field
 from libdestruct.common.obj import obj
 from libdestruct.common.struct import struct
 from libdestruct.common.type_registry import TypeRegistry
+from libdestruct.common.utils import iterate_annotation_chain
 
 if TYPE_CHECKING:  # pragma: no cover
     from libdestruct.backing.resolver import Resolver
@@ -52,7 +53,7 @@ class struct_impl(struct):
     ) -> None:
         current_offset = 0
 
-        for name, annotation in reference_type.__annotations__.items():
+        for name, annotation in iterate_annotation_chain(reference_type, terminate_at=struct):
             if name in reference_type.__dict__:
                 # Field associated with the annotation
                 attrs = getattr(reference_type, name)
@@ -97,7 +98,7 @@ class struct_impl(struct):
         """Compute the size of the struct."""
         size = 0
 
-        for name, annotation in reference_type.__annotations__.items():
+        for name, annotation in iterate_annotation_chain(reference_type, terminate_at=struct):
             if name in reference_type.__dict__:
                 # Field associated with the annotation
                 attrs = getattr(reference_type, name)
