@@ -22,7 +22,7 @@ if TYPE_CHECKING:
     from libdestruct.common.obj import obj
 
 
-PARSED_STRUCT = {}
+PARSED_STRUCTS = {}
 """A cache for parsed struct definitions, indexed by name."""
 
 TYPEDEFS = {}
@@ -53,12 +53,16 @@ def definition_to_type(definition: str) -> type[obj]:
             struct_node = decl.type
 
             if struct_node.name:
-                PARSED_STRUCT[struct_node.name] = struct_to_type(struct_node)
+                PARSED_STRUCTS[struct_node.name] = struct_to_type(struct_node)
         elif isinstance(decl, c_ast.Typedef):
             name, definition = typedef_to_pair(decl)
             TYPEDEFS[name] = definition
 
-    return struct_to_type(root)
+    result = struct_to_type(root)
+
+    PARSED_STRUCTS[root.name] = result
+
+    return result
 
 
 def struct_to_type(struct_node: c_ast.Struct) -> type[struct]:
@@ -68,9 +72,9 @@ def struct_to_type(struct_node: c_ast.Struct) -> type[struct]:
 
     fields = {}
 
-    if not struct_node.decls and struct_node.name in PARSED_STRUCT:
+    if not struct_node.decls and struct_node.name in PARSED_STRUCTS:
         # We can check if the struct is already parsed.
-        return PARSED_STRUCT[struct_node.name]
+        return PARSED_STRUCTS[struct_node.name]
     elif not struct_node.decls:
         raise ValueError("Struct must have fields.")
 
