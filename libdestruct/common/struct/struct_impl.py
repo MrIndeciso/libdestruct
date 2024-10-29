@@ -74,13 +74,12 @@ class struct_impl(struct):
                 # Field associated with the annotation
                 field = getattr(reference_type, name)
                 attribute = cls._inflater.inflater_for((field, annotation))(None)
-                size += attribute.size
             elif isinstance(annotation, Field):
                 attribute = cls._inflater.inflater_for((annotation, annotation.base_type))(None)
-                size += attribute.size
             else:
                 attribute = cls._inflater.inflater_for(annotation)
-                size += attribute.size
+
+            size += attribute.size
 
         cls.size = size
 
