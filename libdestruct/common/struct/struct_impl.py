@@ -95,7 +95,7 @@ class struct_impl(struct):
         """Set the value of the struct to the given value."""
         raise RuntimeError("Cannot set the value of a struct.")
 
-    def freeze(self: obj) -> None:
+    def freeze(self: struct_impl) -> None:
         """Freeze the struct."""
         # The struct has no implicit value, but it must freeze its members
         for member in self._members.values():
