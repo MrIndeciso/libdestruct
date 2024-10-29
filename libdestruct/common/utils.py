@@ -16,18 +16,19 @@ if TYPE_CHECKING:  # pragma: no cover
     from libdestruct.common.obj import obj
 
 
+def is_field_bound_method(item: obj) -> bool:
+    """Check if the provided item is the bound method of a Field object."""
+    return isinstance(item, MethodType) and isinstance(item.__self__, Field)
+
+
 def size_of(item_or_inflater: obj | callable[[Resolver], obj]) -> int:
     """Return the size of an object, from an obj or it's inflater."""
     if hasattr(item_or_inflater, "size"):
         return item_or_inflater.size
 
     # Check if item is the bound method of a Field
-    if not isinstance(item_or_inflater, MethodType):
-        raise TypeError("Provided inflater is not the bound method of a Field object")
+    if is_field_bound_method(item_or_inflater):
+        field_object = item_or_inflater.__self__
+        return field_object.get_size()
 
-    field_object = item_or_inflater.__self__
-
-    if not isinstance(field_object, Field):
-        raise TypeError("Provided inflater is not the bound method of a Field object")
-
-    return field_object.get_size()
+    raise ValueError(f"Cannot determine the size of {item_or_inflater}")
