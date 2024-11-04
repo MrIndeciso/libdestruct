@@ -6,7 +6,7 @@
 
 from __future__ import annotations
 
-from typing import Self
+from typing_extensions import Self
 
 from libdestruct.backing.fake_resolver import FakeResolver
 from libdestruct.backing.resolver import Resolver
