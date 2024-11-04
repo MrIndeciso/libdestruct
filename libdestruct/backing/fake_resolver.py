@@ -6,8 +6,6 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 from libdestruct.backing.resolver import Resolver
 
 
