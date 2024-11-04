@@ -6,17 +6,16 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import Self
 
+from libdestruct.backing.fake_resolver import FakeResolver
+from libdestruct.backing.resolver import Resolver
 from libdestruct.common.attributes.offset_attribute import OffsetAttribute
 from libdestruct.common.field import Field
 from libdestruct.common.obj import obj
 from libdestruct.common.struct import struct
 from libdestruct.common.type_registry import TypeRegistry
 from libdestruct.common.utils import iterate_annotation_chain
-
-if TYPE_CHECKING:  # pragma: no cover
-    from libdestruct.backing.resolver import Resolver
 
 
 class struct_impl(struct):
@@ -34,9 +33,16 @@ class struct_impl(struct):
     _inflater: TypeRegistry = TypeRegistry()
     """The type registry, used for inflating the attributes."""
 
-    def __init__(self: struct_impl, resolver: Resolver) -> None:
+    def __init__(self: struct_impl, resolver: Resolver | None = None, **kwargs: ...) -> None:
         """Initialize the struct implementation."""
-        # array overrides the __init__ method, so we need to call the parent class __init__ method
+        # If we have kwargs and the resolver is None, we provide a fake resolver
+        if kwargs and resolver is None:
+            resolver = FakeResolver()
+
+        if not isinstance(resolver, Resolver):
+            raise TypeError("The resolver must be a Resolver instance.")
+
+        # struct overrides the __init__ method, so we need to call the parent class __init__ method
         obj.__init__(self, resolver)
 
         self.name = self.__class__.__name__
@@ -44,6 +50,15 @@ class struct_impl(struct):
 
         reference_type = self._reference_struct
         self._inflate_struct_attributes(self._inflater, resolver, reference_type)
+
+        for name, value in kwargs.items():
+            getattr(self, name).value = value
+
+    def __new__(cls: struct_impl, *args: ..., **kwargs: ...) -> Self:
+        """Create a new struct."""
+        # Skip the __new__ method of the parent class
+        # struct_impl -> struct -> obj becomes struct_impl -> obj
+        return obj.__new__(cls)
 
     def _inflate_struct_attributes(
         self: struct_impl,
