@@ -28,6 +28,7 @@ PARSED_STRUCTS = {}
 TYPEDEFS = {}
 """A cache for parsed type definitions, indexed by name."""
 
+
 def definition_to_type(definition: str) -> type[obj]:
     """Converts a C struct definition to a struct object."""
     parser = c_parser.CParser()
@@ -39,7 +40,9 @@ def definition_to_type(definition: str) -> type[obj]:
     try:
         ast = parser.parse(definition)
     except c_parser.ParseError as e:
-        raise ValueError("Invalid definition. Please add the necessary includes if using non-standard type definitions.") from e
+        raise ValueError(
+            "Invalid definition. Please add the necessary includes if using non-standard type definitions."
+        ) from e
 
     # We assume that the root declaration is the last one.
     root = ast.ext[-1].type
@@ -122,7 +125,11 @@ def arr_to_type(arr: c_ast.ArrayDecl) -> type[obj]:
 
 def type_decl_to_type(decl: c_ast.TypeDecl, parent: c_ast.Struct | None = None) -> type[obj]:
     """Converts a C type declaration to a type."""
-    if not isinstance(decl, c_ast.TypeDecl) and not isinstance(decl, c_ast.PtrDecl) and not isinstance(decl, c_ast.ArrayDecl):
+    if (
+        not isinstance(decl, c_ast.TypeDecl)
+        and not isinstance(decl, c_ast.PtrDecl)
+        and not isinstance(decl, c_ast.ArrayDecl)
+    ):
         raise TypeError("Definition must be a type declaration.")
 
     if isinstance(decl, c_ast.PtrDecl):
@@ -158,7 +165,7 @@ def to_uniform_name(name: str) -> str:
     """Converts a name to a uniform name."""
     name = name.replace("unsigned", "u")
     name = name.replace("_Bool", "bool")
-    name = name.replace("uchar", "ubyte") # uchar is not a valid ctypes type
+    name = name.replace("uchar", "ubyte")  # uchar is not a valid ctypes type
 
     # We have to convert each intX, uintX, intX_t, uintX_t to the original char, short etc.
     name = name.replace("uint8_t", "ubyte")
@@ -184,7 +191,7 @@ def expand_includes(definition: str) -> str:
         f.write(definition)
         f.flush()
 
-        result = subprocess.run(["cc", "-std=c99", "-E", f.name], capture_output=True, text=True, check=True) # noqa: S607
+        result = subprocess.run(["cc", "-std=c99", "-E", f.name], capture_output=True, text=True, check=True)  # noqa: S607
 
     return result.stdout
 
@@ -192,7 +199,7 @@ def expand_includes(definition: str) -> str:
 def cleanup_attributes(definition: str) -> str:
     """Cleans up attributes in a C definition."""
     # Remove __attribute__ ((...)) from the definition.
-    pattern = r"__attribute__\s*\(\((?:[^()]+|\((?:[^()]+|\([^()]*\))*\))*\)\)" # ChatGPT provided this, don't ask me
+    pattern = r"__attribute__\s*\(\((?:[^()]+|\((?:[^()]+|\([^()]*\))*\))*\)\)"  # ChatGPT provided this, don't ask me
     return re.sub(pattern, "", definition)
 
 

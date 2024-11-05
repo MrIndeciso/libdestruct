@@ -12,7 +12,7 @@ from libdestruct.common.array.array import array
 from libdestruct.common.struct.struct import struct
 from libdestruct.common.utils import size_of
 
-if TYPE_CHECKING: # pragma: no cover
+if TYPE_CHECKING:  # pragma: no cover
     from collections.abc import Generator
 
     from libdestruct.backing.resolver import Resolver

@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING
 from libdestruct.common.field import Field
 from libdestruct.common.obj import obj
 
-if TYPE_CHECKING: # pragma: no cover
+if TYPE_CHECKING:  # pragma: no cover
     from libdestruct.backing.resolver import Resolver
 
 

@@ -4,11 +4,11 @@
 # Licensed under the MIT license. See LICENSE file in the project root for details.
 #
 
-try: # pragma: no cover
+try:  # pragma: no cover
     from rich.traceback import install
 
     install()
-except ImportError: # pragma: no cover
+except ImportError:  # pragma: no cover
     pass
 
 from libdestruct.c import c_int, c_long, c_str, c_uint, c_ulong

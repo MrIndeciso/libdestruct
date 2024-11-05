@@ -12,7 +12,7 @@ from typing import TYPE_CHECKING
 from libdestruct.common.array import array
 from libdestruct.common.field import Field
 
-if TYPE_CHECKING: # pragma: no cover
+if TYPE_CHECKING:  # pragma: no cover
     from libdestruct.backing.resolver import Resolver
     from libdestruct.common.obj import obj
 
