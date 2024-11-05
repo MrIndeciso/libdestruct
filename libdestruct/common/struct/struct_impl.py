@@ -114,7 +114,6 @@ class struct_impl(struct):
         size = 0
 
         for name, annotation, reference in iterate_annotation_chain(reference_type, terminate_at=struct):
-            print(name, annotation, reference)
             if name in reference.__dict__:
                 # Field associated with the annotation
                 attrs = getattr(reference, name)
