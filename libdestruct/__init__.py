@@ -17,7 +17,7 @@ from libdestruct.common.attributes import offset
 from libdestruct.common.enum import enum, enum_of
 from libdestruct.common.ptr import ptr
 from libdestruct.common.struct import ptr_to, ptr_to_self, struct
-from libdestruct.libdestruct import inflater
+from libdestruct.libdestruct import inflate, inflater
 
 __all__ = [
     "array",
@@ -30,6 +30,7 @@ __all__ = [
     "c_ulong",
     "enum",
     "enum_of",
+    "inflate",
     "inflater",
     "struct",
     "ptr",
