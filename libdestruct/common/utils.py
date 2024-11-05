@@ -36,9 +36,16 @@ def size_of(item_or_inflater: obj | callable[[Resolver], obj]) -> int:
     raise ValueError(f"Cannot determine the size of {item_or_inflater}")
 
 
-def iterate_annotation_chain(item: obj, terminate_at: object | None = None) -> Generator[tuple[str, Any]]:
+def iterate_annotation_chain(item: obj, terminate_at: object | None = None) -> Generator[tuple[str, Any, type[obj]]]:
     """Iterate over the annotation chain of the provided item."""
     current_item = item
+
+    chain = []
+
     while current_item is not terminate_at:
-        yield from current_item.__annotations__.items()
+        chain.insert(0, current_item)
         current_item = current_item.__base__ if hasattr(current_item, "__base__") else None
+
+    for reference_item in chain:
+        for name, annotation in reference_item.__annotations__.items():
+            yield name, annotation, reference_item

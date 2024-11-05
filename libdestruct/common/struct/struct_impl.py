@@ -68,10 +68,10 @@ class struct_impl(struct):
     ) -> None:
         current_offset = 0
 
-        for name, annotation in iterate_annotation_chain(reference_type, terminate_at=struct):
-            if name in reference_type.__dict__:
+        for name, annotation, reference in iterate_annotation_chain(reference_type, terminate_at=struct):
+            if name in reference.__dict__:
                 # Field associated with the annotation
-                attrs = getattr(reference_type, name)
+                attrs = getattr(reference, name)
 
                 # If attrs is not a tuple, we need to convert it to a tuple
                 if not isinstance(attrs, tuple):
@@ -113,10 +113,11 @@ class struct_impl(struct):
         """Compute the size of the struct."""
         size = 0
 
-        for name, annotation in iterate_annotation_chain(reference_type, terminate_at=struct):
-            if name in reference_type.__dict__:
+        for name, annotation, reference in iterate_annotation_chain(reference_type, terminate_at=struct):
+            print(name, annotation, reference)
+            if name in reference.__dict__:
                 # Field associated with the annotation
-                attrs = getattr(reference_type, name)
+                attrs = getattr(reference, name)
 
                 # If attrs is not a tuple, we need to convert it to a tuple
                 if not isinstance(attrs, tuple):
