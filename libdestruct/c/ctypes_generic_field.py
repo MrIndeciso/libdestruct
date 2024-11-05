@@ -11,6 +11,8 @@ from ctypes import _SimpleCData, sizeof
 from libdestruct.c.ctypes_generic import _ctypes_generic
 from libdestruct.common.type_registry import TypeRegistry
 
+registry = TypeRegistry()
+
 
 def ctypes_type_handler(obj_type: type) -> type[_ctypes_generic]:
     """Return the ctypes type handler for the given object type.
@@ -21,11 +23,15 @@ def ctypes_type_handler(obj_type: type) -> type[_ctypes_generic]:
     if not issubclass(obj_type, _SimpleCData):
         raise TypeError(f"Unsupported object type: {obj_type}.")
 
-    return type(
+    typ = type(
         f"ctypes_{obj_type.__name__}",
         (_ctypes_generic,),
         {"backing_type": obj_type, "size": sizeof(obj_type)},
     )
 
+    registry.register_mapping(typ, typ)
 
-TypeRegistry().register_type_handler(_SimpleCData, ctypes_type_handler)
+    return typ
+
+
+registry.register_type_handler(_SimpleCData, ctypes_type_handler)

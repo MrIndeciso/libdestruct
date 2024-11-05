@@ -75,12 +75,14 @@ class TypeRegistry:
     def _inflater_for_type(self: TypeRegistry, item: type[obj]) -> type[obj]:
         parent = item.__base__
 
-        for handler in self.type_handlers.get(parent, []):
-            result = handler(item)
+        while parent:
+            for handler in self.type_handlers.get(parent, []):
+                result = handler(item)
 
-            if result is not None:
-                self.mapping[item] = result
-                return result
+                if result is not None:
+                    self.mapping[item] = result
+                    return result
+            parent = parent.__base__
 
         raise ValueError(f"No applicable inflater found for {item}")
 

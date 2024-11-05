@@ -10,8 +10,9 @@ from typing import TYPE_CHECKING
 
 from libdestruct.common.array.array_field import ArrayField
 from libdestruct.common.array.array_impl import array_impl
+from libdestruct.common.utils import size_of
 
-if TYPE_CHECKING: # pragma: no cover
+if TYPE_CHECKING:  # pragma: no cover
     from libdestruct.backing.resolver import Resolver
     from libdestruct.common.array.array import array
     from libdestruct.common.obj import obj
@@ -32,3 +33,7 @@ class LinearArrayField(ArrayField):
             resolver: The backing resolver for the object.
         """
         return array_impl(resolver, self.item, self.size)
+
+    def get_size(self: LinearArrayField) -> int:
+        """Returns the size of the object inflated by this field."""
+        return size_of(self.item) * self.size

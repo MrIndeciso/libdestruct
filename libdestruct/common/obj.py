@@ -9,7 +9,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
-if TYPE_CHECKING: # pragma: no cover
+if TYPE_CHECKING:  # pragma: no cover
     from libdestruct.backing.resolver import Resolver
 
 
@@ -108,7 +108,7 @@ class obj(ABC):
 
         self._set(value)
 
-    def to_str(self: obj, indent: int = 0) -> str:
+    def to_str(self: obj, _: int = 0) -> str:
         """Return a string representation of the object."""
         return f"{self.get()}"
 

@@ -12,7 +12,7 @@ from libdestruct.c.c_integer_types import c_char, c_int, c_long, c_short
 from libdestruct.common.enum.enum import enum
 from libdestruct.common.enum.enum_field import EnumField
 
-if TYPE_CHECKING: # pragma: no cover
+if TYPE_CHECKING:  # pragma: no cover
     from enum import IntEnum
 
     from libdestruct.backing.resolver import Resolver
@@ -54,3 +54,7 @@ class IntEnumField(EnumField):
             resolver: The backing resolver for the object.
         """
         return enum(resolver, self.enum, self.backing_type, self.lenient)
+
+    def get_size(self: IntEnumField) -> int:
+        """Returns the size of the object inflated by this field."""
+        return self.backing_type.size

@@ -9,5 +9,5 @@ from libdestruct.c.c_str import c_str
 
 __all__ = ["c_char", "c_uchar", "c_short", "c_ushort", "c_int", "c_uint", "c_long", "c_ulong", "c_str"]
 
-import libdestruct.c.base_type_inflater  # noqa: F401
+import libdestruct.c.base_type_inflater
 import libdestruct.c.ctypes_generic_field  # noqa: F401

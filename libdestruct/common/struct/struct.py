@@ -9,9 +9,10 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from libdestruct.common.obj import obj
+from libdestruct.common.type_registry import TypeRegistry
 from libdestruct.libdestruct import inflater
 
-if TYPE_CHECKING: # pragma: no cover
+if TYPE_CHECKING:  # pragma: no cover
     from libdestruct.common.struct.struct_impl import struct_impl
 
 
@@ -21,6 +22,12 @@ class struct(obj):
     def __init__(self: struct) -> None:
         """Initialize the struct."""
         raise RuntimeError("This type should not be directly instantiated.")
+
+    def __new__(cls: type[struct], *args: ..., **kwargs: ...) -> struct:  # noqa: PYI034
+        """Create a new struct."""
+        # Look for an inflater for this struct
+        inflater = TypeRegistry().inflater_for(cls)
+        return inflater(*args, **kwargs)
 
     @classmethod
     def from_bytes(cls: type[struct], data: bytes) -> struct_impl:

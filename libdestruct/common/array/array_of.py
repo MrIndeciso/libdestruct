@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING
 
 from libdestruct.common.array.linear_array_field import LinearArrayField
 
-if TYPE_CHECKING: # pragma: no cover
+if TYPE_CHECKING:  # pragma: no cover
     from libdestruct.common.array.array_field import ArrayField
     from libdestruct.common.obj import obj
 
