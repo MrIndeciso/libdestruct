@@ -333,3 +333,38 @@ class BasicStructTest(unittest.TestCase):
         test2 = test_t3.from_bytes(memory)
 
         self.assertNotEqual(test1, test2)
+
+    def test_struct_member_name_collision(self):
+        # Ensure that we can inflate structs with an attribute named "size"
+        class test_t(struct):
+            size: c_int
+            a: c_long
+            b: ptr = ptr_to_self()
+
+        memory = b""
+        memory += (1337).to_bytes(4, "little")
+        memory += (13371337).to_bytes(8, "little")
+        memory += (4 + 8 + 8).to_bytes(8, "little")
+
+        test = test_t.from_bytes(memory)
+
+        self.assertEqual(test.size.value, 1337)
+        self.assertEqual(test.a.value, 13371337)
+        self.assertEqual(test.b.unwrap().address, 4 + 8 + 8)
+        self.assertEqual(test.address, 0x0)
+
+        # Ensure that we can inflate nested structs with an attribute named "size"
+        class test_t2(struct):
+            size: test_t
+            a: c_long
+
+        memory += (0xdeadbeef).to_bytes(8, "little")
+
+        test2 = test_t2.from_bytes(memory)
+
+        self.assertEqual(test2.size.size.value, 1337)
+        self.assertEqual(test2.size.a.value, 13371337)
+        self.assertEqual(test2.size.b.unwrap().address, 4 + 8 + 8)
+        self.assertEqual(test2.size.address, 0x0)
+        self.assertEqual(test2.a.value, 0xdeadbeef)
+        self.assertEqual(test2.address, 0x0)
