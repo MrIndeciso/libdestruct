@@ -15,14 +15,11 @@ from libdestruct.common.field import Field
 from libdestruct.common.obj import obj
 from libdestruct.common.struct import struct
 from libdestruct.common.type_registry import TypeRegistry
-from libdestruct.common.utils import iterate_annotation_chain
+from libdestruct.common.utils import iterate_annotation_chain, size_of
 
 
 class struct_impl(struct):
     """The implementation for the C struct type."""
-
-    size: int
-    """The size of the struct in bytes."""
 
     _members: dict[str, obj]
     """The members of the struct."""
@@ -106,7 +103,7 @@ class struct_impl(struct):
             result = resolved_type(resolver.relative_from_own(current_offset, 0))
             setattr(self, name, result)
             self._members[name] = result
-            current_offset += result.size
+            current_offset += size_of(result)
 
     @classmethod
     def compute_own_size(cls: type[struct_impl], reference_type: type) -> None:
@@ -147,13 +144,13 @@ class struct_impl(struct):
             else:
                 attribute = cls._inflater.inflater_for(annotation)
 
-            size += attribute.size
+            size += size_of(attribute)
 
         cls.size = size
 
     def get(self: struct_impl) -> str:
         """Return the value of the struct."""
-        return f"{self.name}(address={self.address}, size={self.size})"
+        return f"{self.name}(address={self.address}, size={size_of(self)})"
 
     def to_bytes(self: struct_impl) -> bytes:
         """Return the serialized representation of the struct."""
@@ -185,7 +182,7 @@ class struct_impl(struct):
         members = ",\n".join([f"{name}: {member}" for name, member in self._members.items()])
         return f"""{self.name} {{
     address: 0x{self.address:x},
-    size: 0x{self.size:x},
+    size: 0x{size_of(self):x},
     members: {{
         {members}
     }}
@@ -196,7 +193,7 @@ class struct_impl(struct):
         if not isinstance(value, struct_impl):
             return False
 
-        if self.size != value.size:
+        if size_of(self) != size_of(value):
             return False
 
         if not self._members.keys() == value._members.keys():

@@ -25,6 +25,11 @@ def is_field_bound_method(item: obj) -> bool:
 
 def size_of(item_or_inflater: obj | callable[[Resolver], obj]) -> int:
     """Return the size of an object, from an obj or it's inflater."""
+    if hasattr(item_or_inflater.__class__, "size"):
+        # This has the priority over the size of the object itself
+        # as we might be dealing with a struct object
+        # that defines an attribute named "size"
+        return item_or_inflater.__class__.size
     if hasattr(item_or_inflater, "size"):
         return item_or_inflater.size
 
