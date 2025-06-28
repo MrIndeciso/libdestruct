@@ -8,18 +8,18 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from libdestruct.common.struct.ptr_struct_field import PtrStructField
+from libdestruct.common.ptr.ptr_field import PtrField
 
-if TYPE_CHECKING: # pragma: no cover
+if TYPE_CHECKING:  # pragma: no cover
     from libdestruct.common.field import Field
     from libdestruct.common.obj import obj
 
 
-def ptr_to(item: obj | Field) -> PtrStructField:
+def ptr_to(item: obj | Field) -> PtrField:
     """Crafts a struct member which is a pointer to an object."""
-    return PtrStructField(item)
+    return PtrField(item)
 
 
-def ptr_to_self() -> PtrStructField:
+def ptr_to_self() -> PtrField:
     """Crafts a struct member which is a pointer to a struct of the same type."""
-    return PtrStructField(None)
+    return PtrField(None)

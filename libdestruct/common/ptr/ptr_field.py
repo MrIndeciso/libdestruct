@@ -9,18 +9,19 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from libdestruct.common.field import Field
-from libdestruct.common.ptr import ptr
-from libdestruct.common.struct.struct_field import StructField
+from libdestruct.common.ptr.ptr import ptr
 
-if TYPE_CHECKING: # pragma: no cover
+if TYPE_CHECKING:  # pragma: no cover
     from libdestruct.backing.resolver import Resolver
     from libdestruct.common.obj import obj
 
 
-class PtrStructField(StructField):
+class PtrField(Field):
     """A generator for a field of a struct."""
 
-    def __init__(self: PtrStructField, backing_type: type | Field) -> None:
+    base_type: type[obj] = ptr
+
+    def __init__(self: PtrField, backing_type: type | Field) -> None:
         """Initialize a pointer field.
 
         Args:
@@ -28,7 +29,7 @@ class PtrStructField(StructField):
         """
         self.backing_type = backing_type
 
-    def inflate(self: PtrStructField, resolver: Resolver) -> obj:
+    def inflate(self: PtrField, resolver: Resolver) -> obj:
         """Inflate the field.
 
         Args:
@@ -38,3 +39,7 @@ class PtrStructField(StructField):
             return ptr(resolver, self.backing_type.inflate)
 
         return ptr(resolver, self.backing_type)
+
+    def get_size(self: PtrField) -> int:
+        """Returns the size of the object inflated by this field."""
+        return ptr.size

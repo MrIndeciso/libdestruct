@@ -14,10 +14,19 @@ from typing import TYPE_CHECKING
 
 from pycparser import c_ast, c_parser
 
+from libdestruct.common.array.array_of import array_of
+from libdestruct.common.ptr.ptr_factory import ptr_to, ptr_to_self
 from libdestruct.common.struct import struct
 
 if TYPE_CHECKING:
     from libdestruct.common.obj import obj
+
+
+PARSED_STRUCTS = {}
+"""A cache for parsed struct definitions, indexed by name."""
+
+TYPEDEFS = {}
+"""A cache for parsed type definitions, indexed by name."""
 
 
 def definition_to_type(definition: str) -> type[obj]:
@@ -27,28 +36,36 @@ def definition_to_type(definition: str) -> type[obj]:
     # If the definition contains includes, we must expand them.
     if "#include" in definition:
         definition = cleanup_attributes(expand_includes(definition))
-        force_more_tops = True
-    elif "typedef" in definition:
-        force_more_tops = True
-    else:
-        force_more_tops = False
 
     try:
         ast = parser.parse(definition)
     except c_parser.ParseError as e:
-        raise ValueError("Invalid definition. Please add the necessary includes if using non-standard type definitions.") from e
+        raise ValueError(
+            "Invalid definition. Please add the necessary includes if using non-standard type definitions."
+        ) from e
 
-    if not force_more_tops and len(ast.ext) != 1:
-        raise ValueError("Definition must contain exactly one top object.")
-
-    # If force_more_tops is True, we take the last top object.
-    # This is useful when a struct definition is preceded by typedefs.
-    root = ast.ext[-1].type if force_more_tops else ast.ext[0].type
+    # We assume that the root declaration is the last one.
+    root = ast.ext[-1].type
 
     if not isinstance(root, c_ast.Struct):
         raise TypeError("Definition must be a struct.")
 
-    return struct_to_type(root)
+    # We parse each declaration in the definition, except the last one, if it is a struct.
+    for decl in ast.ext[:-1]:
+        if isinstance(decl.type, c_ast.Struct):
+            struct_node = decl.type
+
+            if struct_node.name:
+                PARSED_STRUCTS[struct_node.name] = struct_to_type(struct_node)
+        elif isinstance(decl, c_ast.Typedef):
+            name, definition = typedef_to_pair(decl)
+            TYPEDEFS[name] = definition
+
+    result = struct_to_type(root)
+
+    PARSED_STRUCTS[root.name] = result
+
+    return result
 
 
 def struct_to_type(struct_node: c_ast.Struct) -> type[struct]:
@@ -58,9 +75,15 @@ def struct_to_type(struct_node: c_ast.Struct) -> type[struct]:
 
     fields = {}
 
+    if not struct_node.decls and struct_node.name in PARSED_STRUCTS:
+        # We can check if the struct is already parsed.
+        return PARSED_STRUCTS[struct_node.name]
+    elif not struct_node.decls:
+        raise ValueError("Struct must have fields.")
+
     for decl in struct_node.decls:
         name = decl.name
-        typ = type_decl_to_type(decl.type)
+        typ = type_decl_to_type(decl.type, struct_node)
         fields[name] = typ
 
     type_name = struct_node.name if struct_node.name else "anon_struct"
@@ -68,10 +91,52 @@ def struct_to_type(struct_node: c_ast.Struct) -> type[struct]:
     return type(type_name, (struct,), {"__annotations__": fields})
 
 
-def type_decl_to_type(decl: c_ast.TypeDecl) -> type[obj]:
-    """Converts a C type declaration to a type."""
-    if not isinstance(decl, c_ast.TypeDecl):
+def ptr_to_type(ptr: c_ast.PtrDecl, parent: c_ast.Struct | None = None) -> type[obj]:
+    """Converts a C pointer to a type."""
+    if not isinstance(ptr, c_ast.PtrDecl):
+        raise TypeError("Definition must be a pointer.")
+
+    if not isinstance(ptr.type, c_ast.TypeDecl):
         raise TypeError("Definition must be a type declaration.")
+
+    # Special case: this is a pointer to self
+    # Note that ptr can either be a struct or an identifier.
+    ptr_name = ptr.type.type.name if isinstance(ptr.type.type, c_ast.Struct) else ptr.type.type.names[0]
+    if parent and ptr_name == parent.name:
+        return ptr_to_self()
+
+    typ = type_decl_to_type(ptr.type)
+
+    return ptr_to(typ)
+
+
+def arr_to_type(arr: c_ast.ArrayDecl) -> type[obj]:
+    """Converts a C array to a type."""
+    if not isinstance(arr, c_ast.ArrayDecl):
+        raise TypeError("Definition must be an array.")
+
+    if not isinstance(arr.type, c_ast.TypeDecl) and not isinstance(arr.type, c_ast.PtrDecl):
+        raise TypeError("Definition must be a type declaration.")
+
+    typ = ptr_to_type(arr.type) if isinstance(arr.type, c_ast.PtrDecl) else type_decl_to_type(arr.type)
+
+    return array_of(typ, int(arr.dim.value))
+
+
+def type_decl_to_type(decl: c_ast.TypeDecl, parent: c_ast.Struct | None = None) -> type[obj]:
+    """Converts a C type declaration to a type."""
+    if (
+        not isinstance(decl, c_ast.TypeDecl)
+        and not isinstance(decl, c_ast.PtrDecl)
+        and not isinstance(decl, c_ast.ArrayDecl)
+    ):
+        raise TypeError("Definition must be a type declaration.")
+
+    if isinstance(decl, c_ast.PtrDecl):
+        return ptr_to_type(decl, parent)
+
+    if isinstance(decl, c_ast.ArrayDecl):
+        return arr_to_type(decl)
 
     if isinstance(decl.type, c_ast.Struct):
         return struct_to_type(decl.type)
@@ -82,11 +147,25 @@ def type_decl_to_type(decl: c_ast.TypeDecl) -> type[obj]:
     raise TypeError("Unsupported type.")
 
 
+def typedef_to_pair(typedef: c_ast.Typedef) -> tuple[str, type[obj]]:
+    """Converts a C typedef to a pair of name and definition."""
+    if not isinstance(typedef, c_ast.Typedef):
+        raise TypeError("Definition must be a typedef.")
+
+    if not isinstance(typedef.type, c_ast.TypeDecl):
+        raise TypeError("Definition must be a type declaration.")
+
+    name = "".join(typedef.name)
+    definition = type_decl_to_type(typedef.type)
+
+    return name, definition
+
+
 def to_uniform_name(name: str) -> str:
     """Converts a name to a uniform name."""
     name = name.replace("unsigned", "u")
     name = name.replace("_Bool", "bool")
-    name = name.replace("uchar", "ubyte") # uchar is not a valid ctypes type
+    name = name.replace("uchar", "ubyte")  # uchar is not a valid ctypes type
 
     # We have to convert each intX, uintX, intX_t, uintX_t to the original char, short etc.
     name = name.replace("uint8_t", "ubyte")
@@ -94,6 +173,9 @@ def to_uniform_name(name: str) -> str:
     name = name.replace("int16_t", "short")
     name = name.replace("int32_t", "int")
     name = name.replace("int64_t", "longlong")
+
+    # We have to convert uintptr_t
+    name = name.replace("uintptr_t", "ulonglong")
 
     # Only size_t, ssize_t and time_t can end with _t
     if not any(x in name for x in ["size", "ssize", "time"]):
@@ -109,7 +191,7 @@ def expand_includes(definition: str) -> str:
         f.write(definition)
         f.flush()
 
-        result = subprocess.run(["cc", "-std=c99", "-E", f.name], capture_output=True, text=True, check=True) # noqa: S607
+        result = subprocess.run(["cc", "-std=c99", "-E", f.name], capture_output=True, text=True, check=True)  # noqa: S607
 
     return result.stdout
 
@@ -117,7 +199,7 @@ def expand_includes(definition: str) -> str:
 def cleanup_attributes(definition: str) -> str:
     """Cleans up attributes in a C definition."""
     # Remove __attribute__ ((...)) from the definition.
-    pattern = r"__attribute__\s*\(\((?:[^()]+|\((?:[^()]+|\([^()]*\))*\))*\)\)" # ChatGPT provided this, don't ask me
+    pattern = r"__attribute__\s*\(\((?:[^()]+|\((?:[^()]+|\([^()]*\))*\))*\)\)"  # ChatGPT provided this, don't ask me
     return re.sub(pattern, "", definition)
 
 
@@ -138,5 +220,9 @@ def identifier_to_type(identifier: c_ast.IdentifierType) -> type[obj]:
 
     if hasattr(ctypes, ctypes_name):
         return getattr(ctypes, ctypes_name)
+
+    # Check if we have a typedef to resolve this
+    if identifier_name in TYPEDEFS:
+        return TYPEDEFS[identifier_name]
 
     raise ValueError(f"Unsupported identifier: {identifier_name}.")
